@@ -69,8 +69,8 @@
                 <template slot-scope="scope1">
                   <el-select filterable v-model="scope1.row.people_name" placeholder="请选择">
                     <el-option
-                      v-for="item in people_data"
-                      :key="item.people_name"
+                      v-for="item in people_list"
+                      :key="item.people_id"
                       :label="item.people_name"
                       :value="item.people_name">
                     </el-option>
@@ -132,14 +132,21 @@ export default {
       new_people_name: [],
       video_id: '',
       people_index: 0,
+      people_list: [],
     }
   },
   mounted() {
     this.get_videos()
-
+    this.get_people_list()
   },
   name: 'index',
   methods: {
+    get_people_list: function () {
+      axios.get(process.env.VUE_APP_severURL + '/getPeopleList')
+        .then(res => {
+          this.people_list = res.data.data
+        })
+    },
     delete_item(index){
       alert(index)
     },
@@ -159,6 +166,7 @@ export default {
 
       }).then(resp => {
         if(resp.data.code === 20000)
+
           this.$alert('修改成功', '修改结果', {
             confirmButtonText: '确定',
           });
@@ -167,31 +175,6 @@ export default {
     atext: function(s) {
       var pk = this.promoList[s].pk
       alert(pk)
-    },
-    change_data: function(index, new_name) {
-      if(new_name.toLowerCase() === (this.people_data[index].people_name + '').toLowerCase()){
-        this.$alert('不能修改为原名', '修改失败', {
-          confirmButtonText: '确定',
-        });
-        return;
-      }
-      let param = new FormData()
-      param.append('videoId', this.video_id)
-      param.append('faceIndex', index)
-      param.append('faceName', new_name)
-      axios({
-        method: 'post',
-        url: process.env.VUE_APP_severURL + '/updateFace',
-        contentType: 'application/x-www-form-urlencoded',
-        data: param,
-      })
-        .then(resp => {
-          if(resp.data.code === 20000)
-            this.$alert('修改成功', '修改结果', {
-              confirmButtonText: '确定',
-            });
-        })
-
     },
     change_persion: function(index) {
       this.people_name = this.people_data[index].people_name
