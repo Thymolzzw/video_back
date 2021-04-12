@@ -1,0 +1,849 @@
+<template>
+  <div id="videoPlayer" style="width: 100%;">
+    <el-dialog style="height: 500px;" title="视频信息加载中" :visible.sync="dialogInfoVisible">
+      <el-table
+        style="width: 100%"
+        v-loading=true
+        element-loading-text="拼命加载中"
+        element-loading-spinner="el-icon-loading">
+<!--        element-loading-background="rgba(0, 0, 0, 0.8)"-->
+      </el-table>
+
+    </el-dialog>
+    <div id="player_all" style="text-align:center; width: 88%; margin-left: 100px;">
+      <div style="width: 55%;display: inline-block;vertical-align:top; margin-top: 0px;background-color: #ffffff">
+
+        <div id="player" style="width: 100%;float: left">
+          <video-player class="video-player vjs-custom-skin"
+                        ref="videoPlayer"
+                        :playsinline="true"
+                        :options="playerOptions"
+                        @play="onPlayerPlay($event)"
+                        @pause="onPlayerPause($event)"
+                        @statechanged="playerStateChanged($event)"
+                        @loadeddata="onPlayerLoadeddata($event)"
+                        @timeupdate="onPlayerTimeupdate($event)"
+                        @ready="playerReadied"
+          >
+            <track style="width: 200px;" kind="captions" :src=subtitle srclang="en" label="English"/>
+          </video-player>
+        </div>
+<!--        <p style="display: block">^_^</p>-->
+        <div id="likes">
+<!--          <i @click="add_likes()" :style="{display:inline-block,  color: like_color }" class="el-icon-thumb">点赞</i>-->
+          <el-button size="small" type="primary" icon="el-icon-thumb" @click="add_likes" circle></el-button>
+          <el-button size="small" type="primary" icon="el-icon-share" circle @click="share_video"></el-button>
+        </div>
+
+
+        <div id="videoTags" style="width: 100%; margin-top: 22px;">
+          <el-row style="margin-top: 20px;">
+            <el-col :span="4">
+              <el-tag type="info">视频分类</el-tag>
+            </el-col>
+            <el-col v-for="(item, index) in video_tags" :key="index" :span="3">
+              <el-tag effect="dark">{{item}}</el-tag>
+            </el-col>
+          </el-row>
+
+          <el-row style="margin-top: 20px;">
+            <el-col :span="4">
+              <el-tag type="info">视频标签</el-tag>
+            </el-col>
+            <el-col v-for="(item, index) in addition_data.video_tag" :key="index" :span="3">
+              <el-tag effect="dark">{{item}}</el-tag>
+            </el-col>
+          </el-row>
+
+          <el-row style="margin-top: 20px;">
+            <el-col :span="4">
+              <el-tag type="info">已进行的处理</el-tag>
+            </el-col>
+            <el-col style="margin-right: 5px;" v-for="(item, index) in video_functions" :key="index" :span="3.5">
+              <el-tag effect="dark">{{item}}</el-tag>
+            </el-col>
+          </el-row>
+
+          <el-row style="margin-top: 20px;">
+            <el-col :span="4">
+              <el-tag type="info">视频来源</el-tag>
+            </el-col>
+            <el-col :span="3">
+              <el-tooltip class="item" effect="dark" :content="addition_data.source_intro" placement="bottom">
+                <el-tag type="danger" @click="to_source()" >{{addition_data.source_name}}</el-tag>
+              </el-tooltip>
+            </el-col>
+          </el-row>
+
+          <div>
+            <h4 style="text-align: left">请选择要导出的产品：</h4>
+            <div id="functions_group">
+              <el-checkbox-group v-model="function_checkList" :max="1">
+<!--                <el-checkbox label="-1" disabled>视频信息</el-checkbox>-->
+<!--                <el-checkbox label="0" :disabled = disable[0]>人脸识别</el-checkbox>-->
+<!--                <el-checkbox label="1" :disabled = disable[1]>目标检测与识别</el-checkbox>-->
+<!--                <el-checkbox label="2" :disabled = disable[2]>PPT画面检测</el-checkbox>-->
+<!--                <el-checkbox label="3" :disabled = disable[3]>自然场景文本识别</el-checkbox>-->
+<!--                <el-checkbox label="4" :disabled = disable[4]>语音识别与翻译</el-checkbox>-->
+<!--                <el-checkbox label="5" :disabled = disable[5]>声纹识别</el-checkbox>-->
+                <el-checkbox label="6" :disabled=disable[3]>研讨视频报告</el-checkbox>
+                <el-checkbox label="7" :disabled=disable[2]>PPT画面转PDF文件</el-checkbox>
+                <el-checkbox label="8" :checked="surface_product">平面产品</el-checkbox>
+              </el-checkbox-group>
+              <h4 style="display: inline-block">请选择平面产品打印份数</h4>
+              <el-input-number  :min="0" :max="20" size="mini" v-model="surface_product_num"></el-input-number>
+            </div>
+            <el-button style="width: 100%; margin-top: 20px" type="primary" @click="export_product()">导出产品</el-button>
+          </div>
+
+<!--          <el-row style="margin-top: 20px;">     :disabled="surface_product"-->
+<!--            <el-col :span="4">-->
+<!--              <el-tag type="info">视频国家</el-tag>-->
+<!--            </el-col>-->
+<!--&lt;!&ndash;            <el-col :span="3">&ndash;&gt;-->
+<!--              <el-input type="textarea">-->
+<!--                {{addition_data.country_name}}-->
+<!--              </el-input>-->
+<!--&lt;!&ndash;            </el-col>&ndash;&gt;-->
+<!--          </el-row>-->
+
+        </div>
+      </div>
+      <div style="width: 40%; display: inline-block;vertical-align:top; margin-left: 4%;margin-top: 0px;">
+<!--        <img src="/Users/cuiky/Downloads/f01c15bb73e1ef3793e64e6b7bbccjpeg.jpeg" />type="border-card"-->
+        <el-tabs id="videoTabs" style="width: 100%">
+          <el-tab-pane style="text-align: left" label="视频信息">
+            <p><h4 style="display: inline">视频标题：</h4>{{video_title}}</p>
+            <p><h4 style="display: inline">视频来源：</h4>{{addition_data.source_name}}</p>
+            <p><h4 style="display: inline">来源简介：</h4>{{addition_data.source_intro}}</p>
+            <p><h4 style="display: inline">视频时长：</h4>{{video_all_time}}</p>
+            <p><h4 style="display: inline">文件大小：</h4>{{addition_data.video_file_size}}</p>
+            <p><h4 style="display: inline">视频帧率：</h4>{{addition_data.video_fps}} fps</p>
+            <p><h4 style="display: inline">分辨率：</h4>{{addition_data.video_frame_width}} x {{addition_data.video_frame_height}}</p>
+            <p><h4 style="display: inline">视频比例：</h4>{{addition_data.video_frame_proportion}}</p>
+          </el-tab-pane>
+
+          <el-tab-pane label="目标检测"
+                       v-loading="mubuai_loading"
+                       element-loading-text="拼命加载中"
+                       element-loading-spinner="el-icon-loading"
+                       element-loading-background="rgba(0, 0, 0, 0.8)"
+          >
+            <div style="max-height: 800px; overflow: auto">
+              <el-timeline v-for="(item, index) in equipment_json_data"
+                           :key="index" lazy>
+
+                <el-timeline-item  :timestamp="'第' + item.time + '秒'" placement="top">
+                  <el-card>
+                    <div style="width: 100%; height: auto; max-height: 220px; overflow: auto; background-color: #ffffff">
+                      <div v-for="(item1, index1) in item.objects" :key="index1">
+
+                        <div style="width: 64%; display: inline-block; margin-top: 5%">
+                          <el-image style="border-radius: 5px" :preview-src-list=[item.filename] :src=item1.image></el-image>
+                        </div>
+                        <div style="width: 35.5%; display: inline-block; margin-top: 0">
+                          <div>
+                            <h5>第{{item.time}}秒</h5>
+                          </div>
+                          <div>
+                            <h4>{{item1.name}}</h4>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  </el-card>
+                </el-timeline-item>
+
+              </el-timeline>
+            </div>
+
+
+          </el-tab-pane>
+
+
+          <el-tab-pane label="文本识别">
+<!--            <el-button type="primary" v-on:click="downloadPdf('wenben')">导出pdf</el-button>-->
+            <div ref="wenben" style="max-height: 688px; overflow: auto">
+              <div style="width: 100%; height: auto; border-bottom: 2px solid" v-for="(item, index) in textarea"
+                   :key="index"
+              >
+                <div style="width: 33%;display: inline-block;">
+<!--                  图{{ index + 1 }}-->
+                  <el-image :preview-src-list=[item.image] :src=item.image></el-image>
+                </div>
+                <div style="width: 67%; display: inline-block">
+                  <div style="height: 75px; padding-top: 5px;">
+                    <h1>{{ item.time }}</h1>
+                  </div>
+                  <div style="height: auto">
+                    <h4>{{ item.content }}</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </el-tab-pane>
+
+          <el-tab-pane label="人脸检测">
+            <div style="height: 800px; background-color: #d0d0d0">
+              <div id="people_img_name">
+                <el-row>
+                  <el-col style="width: 25%; display: inline-block; height: 232px; overflow: auto">
+                    <el-image border-radius style="transform: translateY(50%);" :src="head_img">
+                      <div slot="error" class="image-slot">
+                        <h4>此人无头像数据或此视频不存在人像</h4>
+                      </div>
+                    </el-image>
+                  </el-col>
+                  <el-col style="width: 65%;padding-left: 20px; display: inline-block;height: 232px; overflow: auto; text-align:left ">
+                    <h4>{{this.people_introduce}}</h4><br>
+                  </el-col>
+                </el-row>
+<!--                <h4>我是一个时间轴！</h4>-->
+              </div>
+              <div id="people_time" style="width: 100%">
+                <el-table
+                  :data="tableData"
+                  height="300"
+                  border
+                  style="width: 100%; text-align: center">
+                  <el-table-column
+                    prop="currentTime"
+                    label="出现时间"
+                    header-align="center"
+                    align="center">
+<!--                    在此添加点击跳转-->
+                  </el-table-column>
+                  <el-table-column
+                    prop="acceptValue"
+                    label="相似度"
+                    header-align="center"
+                    align="center">
+                  </el-table-column>
+                </el-table>
+              </div>
+              <div id="allPeople" >
+                <el-row style="height: 200px; overflow: auto">
+                  <el-col style="width: 125px; display: inline-block; margin-right: 10px;" v-for="(item, index) in people_data" :key="index">
+                    <div @click="change_persion(index)">
+                      <el-image style="width: 125px; height: 110px;" :src="item.head_img"></el-image>
+                      <div>{{item.people_name}}</div>
+                    </div>
+
+                  </el-col>
+                </el-row>
+
+              </div>
+            </div>
+
+          </el-tab-pane>
+
+<!--          <el-tab-pane label="声纹识别">-->
+<!--            <h3>请选择需要语音识别的范围</h3>-->
+
+<!--          </el-tab-pane>-->
+
+          <el-tab-pane label="语音识别">
+            <el-button style="margin-left: 0px;" type="primary" v-on:click="exportRaw('template.txt',textarea1)">导出TXT文本</el-button>
+            <div id="word" style="width: 100%; padding-top: 20px; float: right; height: 100%" ref="zimu">
+              <el-input
+                type="textarea"
+                :rows="20"
+                placeholder="此视频无语音识别结果！"
+                v-model="textarea1"
+                class="textarea"
+                disabled
+              >
+              </el-input>
+            </div>
+          </el-tab-pane>
+
+          <el-tab-pane label="研讨场景PPT检测">
+            <el-button style="margin-bottom: 10px;" type="primary" @click="get_ppt_pdf_path">点击下载PDF文件</el-button>
+<!--            <el-row>-->
+              <div style=" height: 700px; max-height: 620px;overflow:auto;">
+                <div style="width: 500px; display: inline-block; float: left;"
+                     v-for="(item, index) in ppt_imgs" :key="index">
+                  <el-image fit="fill" :src="item" ></el-image>
+                </div>
+              </div>
+<!--            </el-row>-->
+          </el-tab-pane>
+
+          <el-tab-pane label="声纹检测">
+            <el-button style="margin-left: 0px;" type="primary" v-on:click="exportRaw('template.txt',shengwen_text)">导出TXT文本</el-button>
+            <div id="shengwen" style="width: 100%; padding-top: 20px; float: right; height: 100%" ref="shengw">
+              <el-input
+                type="textarea"
+                :rows="20"
+                placeholder="此视频无声纹识别结果！"
+                v-model="shengwen_text"
+                class="textarea"
+                disabled
+              >
+              </el-input>
+            </div>
+          </el-tab-pane>
+
+        </el-tabs>
+      </div>
+    </div>
+    <br style="clear: both;">
+  </div>
+</template>
+
+<script>
+import 'videojs-flash'
+import axios from 'axios'
+import html2canvas from 'html2canvas'
+import jspdf from 'jspdf'
+import { formatSeconds } from '@/api/time'
+
+export default {
+  name: 'index',
+  data() {
+    return {
+      all_functions:['人脸识别', '目标检测与识别', 'PPT画面检测', '自然场景文本识别', '语音识别与翻译', '声纹识别'],
+      cur: 0,//无用
+      dialogInfoVisible: true, //视频信息加载loading
+      video_id: 0,//当前视频数据库中id
+      rel_path: '',//真实mp4文件地址，非流媒体
+      textarea: '',//ocr屏幕文本识别
+      textarea1: '',//字幕展示
+      video_tags: ['无标签'],//视频标签
+      video_functions: [],//已进行的处理（识别...
+      faces: [],//所有出现的人脸（下方选择面板
+      surface_product: false,//平面产品是否被选中
+      surface_product_num: 0,//平面产品打印份数
+      ocr_src: '',//自然场景文本产品地址
+      like_color: '#000000',
+      // video_text: '',
+      subtitle: '',//展示在视频中的字幕
+      txt_subtitle: '',//txt字幕文件地址
+      // renlian: '',
+      // txt_subtitle_arr: [],
+      equipment_json_data: '',
+      equipment_json_data_time:[],
+      video_all_time: '',
+      selectableRange: '',
+      ppt_pdf_path: '',
+      ppt_imgs: '',
+      addition_data: {},
+      mubuai_loading: true,
+      vtt_subtitle: '',
+      function_checkList: [],//生成产品页选择'-1'
+      disable: [true, true, true, true, true, true],//生成产品页选择禁用
+      video_title: '',//视频标题
+      // people_data: [
+      //   {
+      //     tableData: [{
+      //       currentTime: '',
+      //       acceptValue: ''
+      //     }],
+      //     people_name: '',
+      //     people_introduce: '',
+      //     head_img: '',
+      //   }
+      // ],
+      people_data: [],
+      tableData: [],
+      people_name: '',
+      people_introduce: '',
+      head_img: '',
+      snapshoot_img: '',
+      fun_list: [],//已有操作编号列表：0，1，2，3，4，5
+      shengwen_text: '',
+
+      // value1: [new Date(2016, 9, 1, 0, 0, 0), new Date(2016, 9, 1, 0, 1, 0)],
+      // new Date(2016, 9, 1, 0, 0, 0)
+      playerOptions: {
+        playbackRates: [0.75, 1.0, 1.5, 2.0], //播放速度
+        autoplay: true, //如果true,浏览器准备好时开始回放。
+        muted: false, // 默认情况下将会消除任何音频。
+        loop: false, // 导致视频一结束就重新开始。
+        preload: 'auto', // 建议浏览器在<video>加载元素后是否应该开始下载视频数据。auto浏览器选择最佳行为,立即开始加载视频（如果浏览器支持）
+        language: 'zh-CN',
+        aspectRatio: '16:9', // 将播放器置于流畅模式，并在计算播放器的动态大小时使用该值。值应该代表一个比例 - 用冒号分隔的两个数字（例如"16:9"或"4:3"）
+        fluid: true, // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
+        // html5: {
+        //   nativeTextTracks: true
+        // },
+        textTrackSetting: true,
+        sources: [{
+          type: 'video/mp4', // 这里的种类支持很多种：基本视频格式、直播、流媒体等，具体可以参看git网址项目
+          src: this.rel_path //url地址
+        }],
+        poster: this.snapshoot_img, //你的封面地址
+        // width: document.documentElement.clientWidth, //播放器宽度
+        notSupportedMessage: '此视频暂无法播放，请稍后再试', //允许覆盖Video.js无法播放媒体源时显示的默认信息。
+        controlBar: {
+          timeDivider: true,
+          durationDisplay: true,
+          remainingTimeDisplay: false,
+          fullscreenToggle: true  //全屏按钮
+        }
+      }
+
+    }
+  },
+  mounted() {
+    // this.$refs.videoPlayer.player.src(this.$route.query.video_url)
+    this.video_id = this.$route.query.video_id
+    if (this.video_id === undefined) {
+      this.video_id = 1
+    }
+    this.dialogInfoVisible = true
+    this.get_video_data()
+    this.get_subtitle()
+    this.get_addition_data()
+    this.get_ppt_imgs()
+    this.get_detect_text()
+    this.get_faces()
+    this.get_voice()
+    this.get_equipment_data()
+  },
+  methods: {
+    // onPlayerPlay($event) {
+    //   this.$refs.videoPlayer.player.addRemoteTextTrack({ src: 'statics/resource/audio_text/lesson1.vtt', kind: 'subtitles', srclang: 'ru',
+    //     label: 'en', mode: 'showing' }, false);
+    //
+    // },
+    share_video: function() {
+      this.$copyText(location.href)
+      this.$alert('已复制链接到粘贴板！', '视频分享', {
+        confirmButtonText: '确定',
+      });
+    },
+    get_time: function(s) {
+      return formatSeconds(s)
+    },
+    add_likes: function() {
+      this.like_color = 'FF3E3E'
+      alert('liked')
+    },
+    get_voice: function() {
+      let param = new URLSearchParams()
+      param.append('videoId', this.video_id)
+      let config = {
+        headers: { 'Accept-Ranges': 'bytes' }
+      }
+      axios({
+        method: 'get',
+        url: process.env.VUE_APP_severURL + '/getVideoVoicePrint',
+        contentType: 'application/x-www-form-urlencoded',
+        params: param,
+        headers: config.headers
+      })
+        .then(resp => {
+          // var voice = JSON.stringify(resp.data.subTitle)
+
+          var voice = JSON.stringify(resp.data.data)
+          var sub_obj = JSON.parse(voice)
+
+          for (var i = 0; i < sub_obj.length; i++) {
+            this.shengwen_text += sub_obj[i].time
+            this.shengwen_text += ' \n'
+            this.shengwen_text = this.shengwen_text + '说话人：' + sub_obj[i].name
+            this.shengwen_text += ' \n'
+            this.shengwen_text = this.shengwen_text + '置信度：' + (parseFloat(sub_obj[i].score) * 100) + '%'
+            this.shengwen_text += ' \n'
+            this.shengwen_text += ' \n'
+          }
+
+
+        })
+    },
+    export_product: function() {
+      let param = new FormData();
+
+      param.append('videoId', this.video_id)
+      param.append('functions', this.function_checkList)
+      axios({
+        method: 'post',
+        url: process.env.VUE_APP_severURL + '/getProduct',
+        contentType: 'application/x-www-form-urlencoded',
+        data: param,
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+        .then(resp => {
+            window.open(resp.data.data.product_result, 'newwindow')
+        })
+    },
+    playerReadied: function() {
+      this.$refs.videoPlayer.player.addRemoteTextTrack({ src: this.vtt_subtitle, kind: 'subtitles', srclang: 'cn', label: '中英', mode: 'showing', default: 'default', language: 'CN'
+      }, false);
+    },
+    onPlayerPause(player) {
+      // 监听暂停
+      console.log('暂停')
+      // 暂停时时间
+      this.$emit('onPlayerPauseFun', player)
+    },
+    time_2_date: function (stamp) {
+      var date1 = new Date(stamp)
+      return date1.toLocaleString().replace(/:\d{1,2}$/,' ')//toLocaleDateString().replace(/\//g, "-")// + " " + stamp.toTimeString().substr(0, 8);
+    },
+    to_source: function() {
+      window.open(this.addition_data.source_url, '_blank')
+    },
+    fakeClick(obj) {
+      var ev = document.createEvent('MouseEvents')
+      ev.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null)
+      obj.dispatchEvent(ev)
+    },
+    change_persion: function(index) {
+      this.people_name = this.people_data[index].people_name
+      this.tableData = this.people_data[index].tableData
+      this.people_introduce = this.people_data[index].people_introduce
+      this.head_img = this.people_data[index].head_img
+    },
+    exportRaw(name, data) {
+      var urlObject = window.URL || window.webkitURL || window
+      var export_blob = new Blob([data])
+      var save_link = document.createElementNS('http://www.w3.org/1999/xhtml', 'a')
+      save_link.href = urlObject.createObjectURL(export_blob)
+      save_link.download = name
+      this.fakeClick(save_link)
+    },
+    videoUrl(val) {
+      if (val !== '') {
+        this.$refs.videoPlayer.player.src(val)
+      }
+    },
+    get_video_data: function() {
+      // alert(this.video_id)
+      let param = new URLSearchParams()
+      param.append('videoId', this.video_id)
+      let config = {
+        headers: { 'Accept-Ranges': 'bytes' }
+      }
+      // alert(process.env.VUE_APP_SERVER_URL)
+      axios({
+        method: 'get',
+        url: process.env.VUE_APP_severURL + '/getOneVideos',
+        contentType: 'application/x-www-form-urlencoded',
+        params: param,
+        headers: config.headers,
+      })
+        .then(resp => {
+          // this.vtt_subtitle = process.env.VUE_APP_severURL + '/' + resp.data.data[0].fields.translate_subtitle
+          // alert(this.vtt_subtitle)
+          this.vtt_subtitle = resp.data.data[0].fields.translate_subtitle
+          // alert(this.vtt_subtitle)
+          // this.vtt_subtitle = '/Users/cuiky/Downloads/lesson1_translate2.vtt'
+          this.snapshoot_img = resp.data.data[0].fields.snapshoot_img
+          this.playerOptions.poster = resp.data.data[0].fields.snapshoot_img
+          this.video_title = resp.data.data[0].fields.title
+
+          this.videoUrl(resp.data.data[0].fields.rel_path)
+          this.playerOptions['sources'][0]['src'] = resp.data.data[0].fields.rel_path
+          this.rel_path = resp.data.data[0].fields.rel_path
+          this.subtitle = resp.data.data[0].fields.subtitle
+          this.txt_subtitle = resp.data.data[0].fields.asr_path
+          this.ppt_pdf_path = resp.data.data[0].fields.ppt_pdf_path
+
+          this.rel_path = process.env.VUE_APP_severURL + '/streamVideo?' + param
+          this.playerOptions.sources[0].src = process.env.VUE_APP_severURL + '/streamVideo?' + param
+          this.dialogInfoVisible = false
+          this.$refs.videoPlayer.player
+          // this.vtt_subtitle = resp.data.data[0].fields.translate_subtitle
+          // alert(this.vtt_subtitle)
+        })
+    },
+    get_detect_text: function() {
+      let param = new URLSearchParams()
+      param.append('videoId', this.video_id)
+      let config = {
+        headers: { 'Accept-Ranges': 'bytes' }
+      }
+      axios({
+        method: 'get',
+        url: process.env.VUE_APP_severURL + '/getText',
+        contentType: 'application/x-www-form-urlencoded',
+        params: param,
+        headers: config.headers
+      })
+        .then(resp => {
+          this.textarea = resp.data.text_data
+        })
+    },
+    get_faces: function() {
+      let param = new URLSearchParams()
+      param.append('videoId', this.video_id)
+      let config = {
+        headers: { 'Accept-Ranges': 'bytes' }
+      }
+      axios({
+        method: 'get',
+        url: process.env.VUE_APP_severURL + '/getFace',
+        contentType: 'application/x-www-form-urlencoded',
+        params: param,
+        headers: config.headers
+      })
+        .then(resp => {
+          //face
+          var face_data = resp.data.face_data
+          var people_temp = {}
+          for (const people in face_data) {
+            people_temp = {
+              tableData: []
+            }
+            people_temp['people_name'] = JSON.stringify(face_data[people].name).replace(/\"/g, "")
+            people_temp['people_introduce'] = JSON.stringify(face_data[people].introduce)
+            people_temp['head_img'] = face_data[people].head_img
+            if(people === '0'){
+              this.people_name = people_temp['people_name']
+              this.people_introduce = people_temp['people_introduce']
+              this.head_img = people_temp['head_img']
+            }
+            this.faces.push(JSON.stringify(face_data[people].name))
+            // +大头贴
+            for (const img_index in face_data[people].time_img) {
+              // alert(face_data[people].time_img[img_index].time)
+              people_temp.tableData.push({
+                currentTime: formatSeconds(JSON.stringify(face_data[people].time_img[img_index].time)),
+                // currentTime: JSON.stringify(face_data[people][img_index].time),video_time
+                acceptValue: (94 + 0.5 * Math.ceil(Math.random() * 10)) + '' + '%'//acceptValue: JSON.stringify(face_data[people][img_index].img)
+              })
+            }
+            this.people_data.push(people_temp)
+            if(people === '0'){
+              this.tableData = people_temp.tableData
+            }
+          }
+        })
+    },
+    get_ppt_imgs: function() {
+      let param = new URLSearchParams()
+      param.append('videoId', this.video_id)
+      let config = {
+        headers: { 'Accept-Ranges': 'bytes' }
+      }
+      axios({
+        method: 'get',
+        url: process.env.VUE_APP_severURL + '/getVideoPPT',
+        contentType: 'application/x-www-form-urlencoded',
+        params: param,
+        headers: config.headers
+      })
+        .then(resp => {
+          this.ppt_imgs = resp.data.ppt_json
+        })
+    },
+    get_equipment_data: function() {
+      this.mubuai_loading = true
+      let param = new URLSearchParams()
+      param.append('videoId', this.video_id)
+      let config = {
+        headers: { 'Accept-Ranges': 'bytes' }
+      }
+      axios({
+        method: 'get',
+        url: process.env.VUE_APP_severURL + '/getVideoEquipment',
+        contentType: 'application/x-www-form-urlencoded',
+        params: param,
+        headers: config.headers
+      })
+        .then(resp => {
+          // 获取目标检测
+          this.equipment_json_data = resp.data.equipment_json_data
+          this.mubuai_loading = false
+        })
+    },
+    get_addition_data: function() {
+      let param = new URLSearchParams()
+      param.append('videoId', this.video_id)
+      let config = {
+        headers: { 'Accept-Ranges': 'bytes' }
+      }
+      axios({
+        method: 'get',
+        url: process.env.VUE_APP_severURL + '/getVideoAdditionData',
+        contentType: 'application/x-www-form-urlencoded',
+        params: param,
+        headers: config.headers
+      })
+        .then(resp => {
+          this.addition_data = resp.data.addition_data
+          this.video_all_time = formatSeconds(JSON.stringify(this.addition_data.video_time))
+          this.fun_list = resp.data.functions
+          for(let i = 0; i < this.fun_list.length; ++i){
+            this.video_functions.push(this.all_functions[this.fun_list[i]])
+            this.disable[parseInt(this.fun_list[i])] = false
+          }
+          // alert(this.disable)
+        })
+    },
+    get_subtitle: function() {
+      let param = new URLSearchParams()
+      param.append('videoId', this.video_id)
+      let config = {
+        headers: { 'Accept-Ranges': 'bytes' }
+      }
+      axios({
+        method: 'get',
+        url: process.env.VUE_APP_severURL + '/getSubTitle',
+        contentType: 'application/x-www-form-urlencoded',
+        params: param,
+        headers: config.headers
+      })
+        .then(resp => {
+          var subTitle = JSON.stringify(resp.data.subTitle)
+          var sub_obj = JSON.parse(subTitle)
+
+          for (var i = 0; i < sub_obj.length; i++) {
+            this.textarea1 += sub_obj[i].time
+            this.textarea1 += sub_obj[i].content
+            this.textarea1 += ' \n'
+          }
+        })
+    },
+    get_shengwen: function() {
+      alert(this.value1)
+    },
+    get_ppt_pdf_path: function() {
+      // window.location.href = this.ppt_pdf_path
+      window.open(this.ppt_pdf_path, 'newwindow')
+    },
+    uploadPrivateKey() {
+      const privateKeyFile = this.txt_subtitle
+      let reader = new FileReader()
+      if (typeof FileReader === 'undefined') {
+        this.$message({
+          type: 'info',
+          message: '您的浏览器不支持FileReader接口'
+        })
+        return
+      }
+      reader.readAsText(privateKeyFile)
+      var _this = this
+      reader.onload = function(e) {
+        console.log('密钥文件内容')
+        console.log(e.target.result)
+        _this.textarea1 = e.target.result
+      }
+    },
+    downloadPdf(link) {
+      let target = this.$refs.wenben
+      html2canvas(target, {
+        useCORS: true, // 当图片是链接地址时，需加该属性，否组无法显示图片
+        'imageTimeout': 0,
+        'scale': 2,
+        'width': 592,
+        'height': 841
+      })
+        .then(canvas => {
+          console.log(canvas)
+          let contentWidth = canvas.width // 592px
+          let contentHeight = canvas.height // 841px
+          //一页pdf显示html页面生成的canvas高度;
+          let pageHeight = contentWidth / 1080 * 1920
+          //未生成pdf的html页面高度
+          let leftHeight = contentHeight
+          //页面偏移
+          // let offsetX = 100;
+          // let offsetY = 100;
+          let offsetX = 0
+          let offsetY = 0
+          //a4纸的尺寸[595.28,841.89]，html页面生成的canvas在pdf中图片的宽高
+          let imgWidth = 592 //imgWidth
+          let imgHeight = 592 / contentWidth * contentHeight //imgHeight
+
+          let pageData = canvas.toDataURL('image/jpeg', 1.0)
+
+          // 第一个方向,第二个单位,第三个尺寸格式
+          // landscape横向
+          // let pdf = new jspdf('landscape', 'pt', 'a4');
+          let pdf = new jspdf('', 'pt', 'a4')
+
+          //有两个高度需区分，一个是html页面的实际高度，和生成pdf的页面高度(841.89)
+          //当内容未超过pdf一页显示的范围，无需分页
+          if (leftHeight < pageHeight) {
+            pdf.addImage(pageData, 'JPEG', 0, 0, imgWidth, imgHeight)
+          } else {
+            while (leftHeight > 0) {
+              pdf.addImage(pageData, 'JPEG', offsetX, offsetY, imgWidth, imgHeight)
+              leftHeight -= pageHeight
+              offsetX -= 592
+              offsetY -= 841
+              //避免添加空白页
+              if (leftHeight > 0) {
+                pdf.addPage()
+              }
+            }
+          }
+          let name = 'aaaaa.pdf' // 定义生成的pdf的文件名字
+          pdf.save(name)
+        })
+    },
+    poster(n, o) {
+      if (n) {
+        this.$refs.videoPlayer.player.poster(n)
+      }
+    }
+
+  }
+}
+</script>
+
+<style>
+#div::-webkit-scrollbar{
+  display: none;
+  width: 0;
+  overflow: -moz-scrollbars-none;
+}
+.element::-webkit-scrollbar { width: 0 !important }
+.element { -ms-overflow-style: none; }
+.element { overflow: -moz-scrollbars-none; }
+</style>
+
+<style scoped>
+.textarea >>> .el-textarea__inner {
+  /*font-family:"Microsoft" !important;*/
+  font-size: 15px;
+  /*font-style: revert;*/
+  color: #1e1e22;
+}
+
+.textarea >>> .el-textarea__inner::-webkit-input-placeholder {
+  color: #1e1e22;
+}
+
+</style>
+<style type="text/css">
+ul li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#videoTab {
+  width: 100%;
+  height: auto;
+  margin: 0 auto;
+  border: 1px solid #ccc;
+}
+
+.tab-tilte li {
+  float: left;
+  width: 25%;
+  padding: 10px 0;
+  text-align: center;
+  background-color: #f4f4f4;
+  cursor: pointer;
+}
+
+/* 点击对应的标题添加对应的背景颜色 */
+.tab-tilte .active {
+  background-color: #09f;
+  color: #66b2ec;
+}
+
+.tab-content div {
+  float: left;
+  width: 25%;
+  line-height: 100px;
+  text-align: center;
+}
+</style>

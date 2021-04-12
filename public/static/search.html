@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>军事视频</title>
+
+		<!--网页上标logo-->
+		<link rel="icon" href="img/favicon.png" />
+
+		<link rel="stylesheet" type="text/css" href="./css/search.css"/>
+		<script src="./js/index.js"></script>
+		<script src="./js/jsonp.js"></script>
+		<script src="./js/jquery-3.1.0.js"></script>
+		<script src="./js/jquery-3.1.0.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="./css/iconfont.css"/>
+		<link rel="stylesheet" href="./css/layui_search.css"  media="all">
+	</head>
+	<body>
+
+
+
+
+		<ul class="layui-nav" lay-filter="" style="position:absolute;margin-left:600px;margin-top:70px;">
+		  <li class="layui-nav-item"><a href="">综合</a></li>
+		  <li class="layui-nav-item layui-this"><a href="">视频</a></li>
+		  <li class="layui-nav-item"><a href="">图片</a></li>
+
+		  <li class="layui-nav-item"><a href="">音频</a></li>
+		</ul>
+
+
+
+
+
+		<script src="layui.js" charset="utf-8"></script>
+		<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+		<script>
+		layui.use('element', function(){
+		  var element = layui.element; //导航的hover效果、二级菜单等功能，需要依赖element模块
+
+		  //监听导航点击
+		  element.on('nav(demo)', function(elem){
+		    //console.log(elem)
+		    layer.msg(elem.text());
+		  });
+		});
+		</script>
+
+
+
+		<header id="bigg" class="slider clearfix">
+			<div class="search" style="position:absolute;">
+				<input type="text" name="search" id="search" value="" placeholder="请输入检索词" />
+				<div class="hotsearch">
+					<span class="iconfont icon-zhuzhuangtu"></span>
+					<span class="hotsearch_span">热搜榜</span>
+				</div>
+				<div class="search_button">
+					<a href="xiangqingone.html">
+						<span class="iconfont icon-search"></span>
+						<span class="allsearch">搜索</span>
+					</a>
+
+				</div>
+
+
+
+				<div class="search_right">
+
+
+					<div class="search_right_thr">
+						<span class="iconfont icon-icupload"></span>
+						<span>上传</span>
+					</div>
+					<div class="search_right_fou">
+						<span class="iconfont icon-dianshi"></span>
+						<span>打开客户端</span>
+					</div>
+					<div class="search_right_fiv">
+						<img src="img/cat_mao.jpg"/>
+					</div>
+				</div>
+				<ul id="search_ul"></ul>
+			</div>
+		</header>
+
+
+		<div class="search_inner" style="width=1120px;margin:40px auto 10px;border-top: 2px solid #009688;margin-top:40px;">
+
+		</div>
+
+		<div class="content">
+			<fieldset class="layui-elem-field site-demo-button" style="margin-top: 10px;padding-t:10px;">
+ 				<div>
+ 					<!--errorbutton-->
+
+				    <button type="button" class="layui-btn">综合排序
+						<div style="height:20px;margin-left:90px;padding-left:10px;margin-top:-20px;z-index: 1000;">
+							<a class="sam_a1" href="xiangqingone.html">最多点击</a>
+							<a class="sam_a1" href="xiangqingone.html" style="margin-left:35px;">最高浏览</a>
+							<a class="sam_a1" href="xiangqingone.html" style="margin-left:35px;">最多评论</a>
+							<a class="sam_a1" href="xiangqingone.html" style="margin-left:35px;">最新发布</a>
+						</div>
+				    </button>
+
+
+				    <br>
+				    <br>
+
+			    	<button type="button" class="layui-btn">视频时长
+
+						<div style="height:20px;margin-left:90px;padding-left:10px;margin-top:-20px;">
+							<a class="sam_a2" href="xiangqingone.html">0-10min</a>
+							<a class="sam_a2" href="xiangqingone.html" style="margin-left:35px;">10-30min</a>
+							<a class="sam_a2" href="xiangqingone.html" style="margin-left:35px;">30-60min</a>
+							<a class="sam_a2" href="xiangqingone.html" style="margin-left:35px;">60min以上</a>
+						</div>
+			    	</button>
+
+
+    			</div>
+
+				<br>
+				<br>
+
+    			<div class="layui-upload">
+				<div style="height:20px;margin-top:-15px;">
+			    	<button type="button" class="layui-btn" id="test1">上传图片</button>
+			  		<div class="layui-upload-list">
+				    	<img class="layui-upload-img" id="demo1">
+				    	<p id="demoText"></p>
+			  		</div>
+			  	</div>
+
+				<br>
+				<br>
+
+			  	<button type="button" class="layui-btn" id="test5" style="margin-top:60px;">上传视频</button>
+
+			  	<br>
+				<br>
+
+				<button type="button" class="layui-btn" id="test6">上传音频</button>
+
+
+				<br>
+				<br>
+
+			    <button type="button" class="layui-btn">高级搜索
+
+			    </button>
+
+
+			    <div id="highsearch" style="width=1200px;margin-left:585px; margin-top:-25px;">
+				<!--这是关键字输入框—-->
+				    <div class="layui-form-item">
+	    				<label class="layui-form-label">关键字：</label>
+	    				<div class="layui-input-block">
+	      					<input type="text" name="title" required  lay-verify="required" placeholder="请输入关键字" autocomplete="off" class="layui-input">
+	    				</div>
+					</div>
+					<!--这是类型输入框—-->
+					<form class="layui-form" action="" lay-filter="example">
+	  					<div class="layui-form-item">
+	    					<label class="layui-form-label">类&nbsp;&nbsp;&nbsp;&nbsp;型：</label>
+	    					<div class="layui-input-block">
+	      						<input type="radio" name="sex" value="男" title="全部" checked="">
+	      						<input type="radio" name="sex" value="女" title="原创">
+	      						<input type="radio" name="sex" value="女" title="转发">
+	      						<input type="radio" name="sex" value="女" title="热门">
+	    					</div>
+	 			 		</div>
+					</form>
+
+					<form class="layui-form" action="">
+	  					<div class="layui-form-item" pane="">
+	    					<label class="layui-form-label">包&nbsp;&nbsp;&nbsp;&nbsp;含：</label>
+	    					<div class="layui-input-block">
+	      						<input type="checkbox" name="like1[write]" lay-skin="primary" title="全部" checked="">
+	      						<input type="checkbox" name="like1[read]" lay-skin="primary" title="含图片">
+	      						<input type="checkbox" name="like1[read]" lay-skin="primary" title="含视频">
+	      						<input type="checkbox" name="like1[read]" lay-skin="primary" title="含音频">
+	      						<input type="checkbox" name="like1[read]" lay-skin="primary" title="纯文字">
+	    					</div>
+	  					</div>
+					</form>
+
+					<form class="layui-form" action="">
+
+					</form>
+				</div>
+
+
+					<script src="layui.js" charset="utf-8"></script>
+					<script>
+						layui.use(['form', 'layedit', 'laydate'], function(){
+						  var form = layui.form
+						  ,layer = layui.layer
+						  ,layedit = layui.layedit
+						  ,laydate = layui.laydate;
+
+
+						  //表单赋值
+						  layui.$('#LAY-component-form-setval').on('click', function(){
+						    form.val('example', {
+						      "username": "贤心" // "name": "value"
+						      ,"password": "123456"
+						      ,"interest": 1
+						      ,"like[write]": true //复选框选中状态
+						      ,"close": true //开关状态
+						      ,"sex": "女"
+						      ,"desc": "我爱 layui"
+						    });
+						  });
+
+						});
+					</script>
+
+
+
+			</fieldset>
+
+
+
+
+
+
+
+
+
+<script src="layui.js" charset="utf-8"></script>
+<!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+<script>
+layui.use('upload', function(){
+  var $ = layui.jquery
+  ,upload = layui.upload;
+
+  //普通图片上传
+  var uploadInst = upload.render({
+    elem: '#test1'
+    ,url: 'https://httpbin.org/post' //改成您自己的上传接口
+    ,before: function(obj){
+      //预读本地文件示例，不支持ie8
+      obj.preview(function(index, file, result){
+        $('#demo1').attr('src', result); //图片链接（base64）
+      });
+    }
+    ,done: function(res){
+      //如果上传失败
+      if(res.code > 0){
+        return layer.msg('上传失败');
+      }
+      //上传成功
+    }
+    ,error: function(){
+      //演示失败状态，并实现重传
+      var demoText = $('#demoText');
+      demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+      demoText.find('.demo-reload').on('click', function(){
+        uploadInst.upload();
+      });
+    }
+  });
+
+  //多图片上传
+  upload.render({
+    elem: '#test2'
+    ,url: 'https://httpbin.org/post' //改成您自己的上传接口
+    ,multiple: true
+    ,before: function(obj){
+      //预读本地文件示例，不支持ie8
+      obj.preview(function(index, file, result){
+        $('#demo2').append('<img src="'+ result +'" alt="'+ file.name +'" class="layui-upload-img">')
+      });
+    }
+    ,done: function(res){
+      //上传完毕
+    }
+  });
+
+  //指定允许上传的文件类型
+  upload.render({
+    elem: '#test3'
+    ,url: 'https://httpbin.org/post' //改成您自己的上传接口
+    ,accept: 'file' //普通文件
+    ,done: function(res){
+      layer.msg('上传成功');
+      console.log(res);
+    }
+  });
+  upload.render({ //允许上传的文件后缀
+    elem: '#test4'
+    ,url: 'https://httpbin.org/post' //改成您自己的上传接口
+    ,accept: 'file' //普通文件
+    ,exts: 'zip|rar|7z' //只允许上传压缩文件
+    ,done: function(res){
+      layer.msg('上传成功');
+      console.log(res)
+    }
+  });
+  upload.render({
+    elem: '#test5'
+    ,url: 'https://httpbin.org/post' //改成您自己的上传接口
+    ,accept: 'video' //视频
+    ,done: function(res){
+      layer.msg('上传成功');
+      console.log(res)
+    }
+  });
+  upload.render({
+    elem: '#test6'
+    ,url: 'https://httpbin.org/post' //改成您自己的上传接口
+    ,accept: 'audio' //音频
+    ,done: function(res){
+      layer.msg('上传成功');
+      console.log(res)
+    }
+  });
+
+  //设定文件大小限制
+  upload.render({
+    elem: '#test7'
+    ,url: 'https://httpbin.org/post' //改成您自己的上传接口
+    ,size: 60 //限制文件大小，单位 KB
+    ,done: function(res){
+      layer.msg('上传成功');
+      console.log(res)
+    }
+  });
+
+  //同时绑定多个元素，并将属性设定在元素上
+  upload.render({
+    elem: '.demoMore'
+    ,before: function(){
+      layer.tips('接口地址：'+ this.url, this.item, {tips: 1});
+    }
+    ,done: function(res, index, upload){
+      var item = this.item;
+      console.log(item); //获取当前触发上传的元素，layui 2.1.0 新增
+    }
+  })
+
+  //选完文件后不自动上传
+  upload.render({
+    elem: '#test8'
+    ,url: 'https://httpbin.org/post' //改成您自己的上传接口
+    ,auto: false
+    //,multiple: true
+    ,bindAction: '#test9'
+    ,done: function(res){
+      layer.msg('上传成功');
+      console.log(res)
+    }
+  });
+
+  //拖拽上传
+  upload.render({
+    elem: '#test10'
+    ,url: 'https://httpbin.org/post' //改成您自己的上传接口
+    ,done: function(res){
+      layer.msg('上传成功');
+      layui.$('#uploadDemoView').removeClass('layui-hide').find('img').attr('src', res.files.file);
+      console.log(res)
+    }
+  });
+
+  //多文件列表示例
+  var demoListView = $('#demoList')
+  ,uploadListIns = upload.render({
+    elem: '#testList'
+    ,url: 'https://httpbin.org/post' //改成您自己的上传接口
+    ,accept: 'file'
+    ,multiple: true
+    ,auto: false
+    ,bindAction: '#testListAction'
+    ,choose: function(obj){
+      var files = this.files = obj.pushFile(); //将每次选择的文件追加到文件队列
+      //读取本地文件
+      obj.preview(function(index, file, result){
+        var tr = $(['<tr id="upload-'+ index +'">'
+          ,'<td>'+ file.name +'</td>'
+          ,'<td>'+ (file.size/1024).toFixed(1) +'kb</td>'
+          ,'<td>等待上传</td>'
+          ,'<td>'
+            ,'<button class="layui-btn layui-btn-xs demo-reload layui-hide">重传</button>'
+            ,'<button class="layui-btn layui-btn-xs layui-btn-danger demo-delete">删除</button>'
+          ,'</td>'
+        ,'</tr>'].join(''));
+
+        //单个重传
+        tr.find('.demo-reload').on('click', function(){
+          obj.upload(index, file);
+        });
+
+        //删除
+        tr.find('.demo-delete').on('click', function(){
+          delete files[index]; //删除对应的文件
+          tr.remove();
+          uploadListIns.config.elem.next()[0].value = ''; //清空 input file 值，以免删除后出现同名文件不可选
+        });
+
+        demoListView.append(tr);
+      });
+    }
+    ,done: function(res, index, upload){
+      if(res.files.file){ //上传成功
+        var tr = demoListView.find('tr#upload-'+ index)
+        ,tds = tr.children();
+        tds.eq(2).html('<span style="color: #5FB878;">上传成功</span>');
+        tds.eq(3).html(''); //清空操作
+        return delete this.files[index]; //删除文件队列已经上传成功的文件
+      }
+      this.error(index, upload);
+    }
+    ,error: function(index, upload){
+      var tr = demoListView.find('tr#upload-'+ index)
+      ,tds = tr.children();
+      tds.eq(2).html('<span style="color: #FF5722;">上传失败</span>');
+      tds.eq(3).find('.demo-reload').removeClass('layui-hide'); //显示重传
+    }
+  });
+
+  //绑定原始文件域
+  upload.render({
+    elem: '#test20'
+    ,url: 'https://httpbin.org/post' //改成您自己的上传接口
+    ,done: function(res){
+      layer.msg('上传成功');
+      console.log(res)
+    }
+  });
+
+});
+</script>
+		</div>
+
+
+
+
+		<footer class="footer">
+			<div class="footer_inner">
+				<div class="footer_inner_one">
+					<div class="footer_inner_one_fir">
+						<em class="footer_inner_one_fir_title">热门频道</em>
+						<ul>
+							<li><a href="#">电视剧</a></li>
+							<li><a href="#">综艺</a></li>
+							<li><a href="#">电影</a></li>
+							<li><a href="#">娱乐</a></li>
+							<li><a href="#">MV</a></li>
+							<li><a href="#">动漫</a></li>
+							<li><a href="#">游戏</a></li>
+							<li><a href="#">VIP影院</a></li>
+							<li><a href="#">英美剧</a></li>
+							<li><a href="#">纪录片</a></li>
+							<li><a href="#">新闻</a></li>
+							<li><a href="#">体育</a></li>
+							<li><a href="#">生活</a></li>
+						</ul>
+					</div>
+					<div class="footer_inner_two_fir">
+						<em class="footer_inner_two_fir_title">特色推荐</em>
+						<ul>
+							<li><a href="#">原创自媒体</a></li>
+							<li><a href="#">微电影</a></li>
+							<li><a href="#">拍客</a></li>
+							<li><a href="#">搞笑</a></li>
+
+						</ul>
+					</div>
+					<div class="footer_inner_thr_fir">
+						<em class="footer_inner_thr_fir_title">软件下载</em>
+						<div class="footer_inner_thr_fir_icon">
+							<a href="javascript:;">
+								<i class="iconfont icon-shouji"></i>
+								<span>手机版</span>
+							</a>
+							<a href="javascript:;">
+								<i class="iconfont icon-win"></i>
+								<span>Windows版</span>
+							</a>
+							<a href="javascript:;">
+								<i class="iconfont icon-mac"></i>
+								<span>Mac版</span>
+							</a>
+							<a href="javascript:;">
+								<i class="iconfont icon-ipad"></i>
+								<span>iPad版</span>
+							</a>
+							<a href="javascript:;">
+								<i class="iconfont icon-television"></i>
+								<span>TV版</span>
+							</a>
+						</div>
+					</div>
+					<div class="footer_inner_fou_fir">
+						<em class="footer_inner_fou_fir_title">服务</em>
+						<ul>
+							<li><a href="#">客服</a></li>
+							<li><a href="#">反馈</a></li>
+							<li><a href="#">侵权投诉</a></li>
+							<li><a href="#">免广告合作</a></li>
+
+						</ul>
+					</div>
+				</div>
+				<div class="footer_lastone">
+					<div class="footer_lasttwo">
+						<a href="#">关于腾讯</a>
+						|
+						<a href="#">About Tencent</a>
+						|
+						<a href="#">服务条款</a>
+						|
+						<a href="#">广告服务</a>
+						|
+						<a href="#">腾讯招聘</a>
+						|
+						<a href="#">客服中心</a>
+						|
+						<a href="#">网站导航</a>
+						|
+						<a href="index.html">回到首页</a>
+					</div>
+					<div class="footer_inner_two_sed">
+						Copyright  1998 - 2018 Tencent. All Rights Reserved.
+					</div>
+					<div class="footer_inner_two_thr">
+						腾讯公司 版权所有 腾讯网络文化经营许可证
+					</div>
+				</div>
+			</div>
+		</footer>
+
+		<aside class="cebian">
+			<div>
+				<span class="iconfont icon-vip"></span>
+			</div>
+			<div class="nnow">
+				<span class="iconfont icon-xiaoxi"></span>
+				<a href="#">意见反馈</a>
+			</div>
+			<div>
+				<span class="iconfont icon-xiazai"></span>
+			</div>
+			<div class="nnow">
+				<span class="iconfont icon-arrowdown"></span>
+				<a href="#">返回顶部</a>
+			</div>
+		</aside>
+
+		<script src="./js/index.js"></script>
+	</body>
+</html>
