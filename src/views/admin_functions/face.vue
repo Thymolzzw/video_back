@@ -75,7 +75,7 @@
                       :value="item.people_name">
                     </el-option>
                   </el-select>
-                  <el-button style="margin: 5px;" type="primary" @click="update_time(scope1.row.people_name, scope1.$index)">确认修改</el-button>
+                  <el-button :disabled="scope1.row.people_name == null" style="margin: 5px;" type="primary" @click="update_time(scope1.row.people_name, scope1.$index)">确认修改</el-button>
                 </template>
               </el-table-column>
 
@@ -145,6 +145,24 @@ export default {
     },
     update_time(people_name, index){
       alert(people_name+index)
+      let param = new FormData()
+      param.append('videoId', this.video_id)
+      param.append('update_people_index', this.people_index)
+      param.append('update_time_index', index)
+      param.append('update_time_people_name', people_name)
+
+      axios({
+        method: 'post',
+        url: process.env.VUE_APP_severURL + '/updateFaceItem',
+        contentType: 'application/x-www-form-urlencoded',
+        data: param,
+
+      }).then(resp => {
+        if(resp.data.code === 20000)
+          this.$alert('修改成功', '修改结果', {
+            confirmButtonText: '确定',
+          });
+      })
     },
     atext: function(s) {
       var pk = this.promoList[s].pk
