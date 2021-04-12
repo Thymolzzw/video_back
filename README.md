@@ -1,16 +1,16 @@
 ## Introduction
 
-vue-element-video_back is HanWang's 项目。
+vue-element-video_back is Thymolzzw's 项目。
 
 
 ## Getting started
 
 ```bash
 # clone the project
-git clone https://github.com/PanJiaChen/vue-element-admin.git
+git clone https://github.com/Thymolzzw/video_back.git
 
 # enter the project directory
-cd vue-element-admin
+cd video_back
 
 # install dependency
 npm install
@@ -51,4 +51,4 @@ Refer to [Documentation](https://panjiachen.github.io/vue-element-admin-site/gui
 
 
 
-"# video_back_1" 
+# video_back
