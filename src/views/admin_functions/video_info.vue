@@ -261,7 +261,7 @@ export default {
         url: process.env.VUE_APP_severURL + '/getVideoAdditionData',
         contentType: 'application/x-www-form-urlencoded',
         params: param,
-        headers: config.headers
+
       }).then(resp => {
           this.tableData = []
           this.addition_data = resp.data.addition_data

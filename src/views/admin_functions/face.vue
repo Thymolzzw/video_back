@@ -149,9 +149,27 @@ export default {
     },
     delete_item(index){
       alert(index)
+      let param = new FormData()
+      param.append('videoId', this.video_id)
+      param.append('delete_people_index', this.people_index)
+      param.append('delete_time_index', index)
+
+      axios({
+        method: 'post',
+        url: process.env.VUE_APP_severURL + '/deleteFaceItem',
+        contentType: 'application/x-www-form-urlencoded',
+        data: param,
+
+      }).then(resp => {
+        if(resp.data.code === 20000)
+          this.get_faces(this.video_value)
+          this.$alert('删除成功', '修改结果', {
+            confirmButtonText: '确定',
+          });
+      })
     },
     update_time(people_name, index){
-      alert(people_name+index)
+      // alert(people_name+index)
       let param = new FormData()
       param.append('videoId', this.video_id)
       param.append('update_people_index', this.people_index)
@@ -166,7 +184,7 @@ export default {
 
       }).then(resp => {
         if(resp.data.code === 20000)
-
+          this.get_faces(this.video_value)
           this.$alert('修改成功', '修改结果', {
             confirmButtonText: '确定',
           });
@@ -184,10 +202,16 @@ export default {
       this.people_index = index
     },
     get_faces: function(s) {
+      this.people_name = ''
+      this.tableData = []
+      this.people_introduce = ''
+      this.head_img = ''
+      this.people_index = 0
+
       this.video_id = this.promoList[s].pk
       this.people_data = []
       let param = new URLSearchParams()
-      param.append('videoId', this.promoList[s].pk)
+      param.append('videoId', this.video_id)
       let config = {
         headers: { 'Accept-Ranges': 'bytes' }
       }
@@ -196,7 +220,7 @@ export default {
         url: process.env.VUE_APP_severURL + '/getFace',
         contentType: 'application/x-www-form-urlencoded',
         params: param,
-        headers: config.headers
+
       })
         .then(resp => {
           //face
