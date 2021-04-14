@@ -62,9 +62,7 @@ export default {
     }
   },
   methods: {
-    search_video: function() {
-      alert(this.input)
-    },
+
     to_play_video: function (event) {
       // alert(event)
       this.$router.push({
@@ -82,27 +80,20 @@ export default {
       let param = new FormData()
       param.append('searchType', this.checkList)
       param.append('searchText', this.input)
-      let config = {
-        headers: { 'Accept-Ranges': 'bytes' }
-      }
+      // let config = {
+      //   headers: { 'Accept-Ranges': 'bytes' }
+      // }
       axios({
         method: 'post',
         url: process.env.VUE_APP_severURL + '/searchVideos',
         contentType: 'application/x-www-form-urlencoded',
         data: param,
-        headers: config.headers
       })
         .then(resp => {
           this.promoList = resp.data.data
         })
     },
-    get_all_videos: function () {
-      axios.get(process.env.VUE_APP_severURL + '/getAllVideos')
-        .then(res => {
-          console.log(res.data.data)
-          this.promoList = res.data.data
-        })
-    },
+
   }
 }
 </script>
