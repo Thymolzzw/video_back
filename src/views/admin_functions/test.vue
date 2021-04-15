@@ -1,275 +1,348 @@
 <template>
   <div>
-    <div style="text-align:left">
-      <!-- <el-input v-model="tableDataName" size="small" placeholder="请输入姓名" style="width:240px"></el-input>
-      <el-button type="primary" size="small" @click="searchUser">搜索</el-button> -->
-      <!-- <el-button type="primary" size="small" @click="openData">展示数据</el-button> -->
-      <el-button type="success" size="small" @click="addRow(users)">新增</el-button>
-      <!-- <el-button type="success" size="small" @click="handleAdd()">新增</el-button> -->
-      <el-button type="primary" size="small" @click="removeUsers()">批量删除</el-button>
+    <div style="margin-top:50px;width: calc(100% - 10px);height:calc(100vh - 140px);">
+      <SeeksRelationGraph ref="seeksRelationGraph" :options="graphOptions" :on-node-click="onNodeClick"
+                          :on-line-click="onLineClick"/>
     </div>
-    <div>
-      <el-table :data="users" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;">
-        <el-table-column type="selection" width="60">
-        </el-table-column>
-        <el-table-column type="index" width="60">
-        </el-table-column>
-        <el-table-column prop="name"  label="商品名称" width="120" sortable>
-        </el-table-column>
-        <el-table-column prop="price" label="价格" width="100" sortable>
-        </el-table-column>
-        <el-table-column prop="reserve" label="商品库存" min-width="120" sortable>
-        </el-table-column>
-        <el-table-column prop="data" label="日期" min-width="120" sortable>
-        </el-table-column>
-        <el-table-column prop="desc" label="商品描述" min-width="180" sortable>
-        </el-table-column>
-        <el-table-column label="操作" width="300">
-          <template slot-scope="scope">
-            <!-- <el-button type="success" size="small" @click="handleEdit(scope.$index, scope.row)">新增</el-button> -->
-            <el-button type="primary" size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-            <el-button size="small" type="danger" @click="handleDelete(scope.$index, users)">删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-    </div>
-    <!--新增/编辑界面-->
-    <el-dialog :title="titleMap[dialogStatus]" :visible.sync="FormVisible" :close-on-click-modal="false" class="edit-form"
-               :before-close="handleClose">
-      <el-form :model="Form" label-width="80px" :rules="editFormRules" ref="Form">
-        <el-form-item label="商品名称" prop="name">
-          <el-input v-model="Form.name" auto-complete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="商品价格">
-          <el-input-number v-model="Form.price"></el-input-number>
-        </el-form-item>
-        <el-form-item label="商品库存">
-          <el-input v-model="Form.reserve"></el-input>
-        </el-form-item>
-        <el-form-item label="选择日期" :picker-options="pickerOptions">
-          <div>
-            <el-date-picker v-model="Form.data" type="date" placeholder="选择日期" format="yyyy 年 MM 月 dd 日"
-                            value-format="yyyy-MM-dd"></el-date-picker>
-          </div>
-        </el-form-item>
-        <el-form-item label="商品描述">
-          <el-input type="textarea" v-model="Form.desc"></el-input>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click.native="handleCancel('Form')">取消</el-button>
-        <el-button v-if="addBtnshow" type="primary" @click.native="confirmAdd('Form')">确定</el-button>
-        <el-button v-if="editBtnshow" type="primary" @click.native="confirmEdit('Form')">确定</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
+
 <script>
-var _index;
+import SeeksRelationGraph from 'relation-graph'
+import axios from 'axios'
 export default {
+  name: 'SeeksRelationGraphDemo',
+  components: { SeeksRelationGraph },
   data() {
     return {
-      pickerOptions: {
-        disabledDate(time) {
-          return time.getTime() > Date.now();
-        }
-      },
-      titleMap: {
-        addEquipment:'新增',
-        editEquipment: "编辑"
-      },
-      //新增和编辑弹框标题
-      dialogStatus: "",
-      Form: {
-        id: 0,
-        name: '',
-        price: 0,
-        reserve:'',
-        data: '',
-        desc: '',
-      },
-      users:[
-        {name:'牙刷',price:'13',reserve:'13',data:'',desc:'11'},
-        {name:'牙膏',price:'13',reserve:'12',data:'',desc:'22'},
-        {name:'旁氏洗面奶',price:'33',reserve:'45',data:'',desc:'33'},
-        {name:'无印良品水乳',price:'22',reserve:'34',data:'',desc:'55'},
-        {name:'悦风诗吟',price:'113',reserve:'56',data:'',desc:'99'}
-      ],
-      editFormRules:{
-        name: [
-          { required: true, message: '请输入商品名称', trigger: 'blur' }
+      g_loading: true,
+      demoname: '---',
+      graphOptions: {
+        defaultNodeBorderWidth: 0,
+        defaultNodeColor: 'rgba(238, 178, 94, 1)',
+        allowSwitchLineShape: true,
+        allowSwitchJunctionPoint: true,
+        defaultLineShape: 1,
+        'layouts': [
+          {
+            'label': '自动布局',
+            'layoutName': 'force',
+            'layoutClassName': 'seeks-layout-force'
+          }
         ],
-        reserve: [
-          { required: true, message: '请输入商品库存', trigger: 'blur' }
-        ],
-        desc: [
-          { required: true, message: '请输入商品描述', trigger: 'blur' }
-        ],
-      },
-      FormVisible: false,
-      currentRow:[],
-      ids:[],
-      listLoading:'',
-      addBtnshow:false,
-      editBtnshow:false,
-      editLoading:'',
-      dialogStatus: '',
-      selected:[],
-      editid:'',
-      searchForm:[]
+        defaultJunctionPoint: 'border'
+        // 这里可以参考"Graph 图谱"中的参数进行设置
+      }
     }
+  },
+  created() {
+  },
+  mounted() {
+    this.demoname = this.$route.params.demoname
+    this.setGraphData()
   },
   methods: {
-    // searchUser(){
-    //   console.log(this.searchForm.name)
-    //   var username = this.searchForm.name;
-    //   let resultdata = this.userlist.filter(users =>{
-    //     if(users.name == username|| users.name.indexOf(username) != -1)
-    //     {
-    //       console.log("已找到！")
-    //       return true;
-    //     }
-    //   });
-    //   this.userlist = resultdata;
-    // },
-    selsChange:function(val){  //点击选中
-      console.log(val);
-      this.selected = val;
-    },
-    // 直接新增一行空行
-    // handleAdd(val) {
-    //   this.dialogStatus = 'create';
-    //   this.ViewVisible = true;
-//       },
-//       addRow(users,event){//新增一行
-//  //之前一直想不到怎么新增一行空数据，最后幸亏一位朋友提示：表格新增一行，其实就是源数据的新增，从源数据入手就可以实现了，于是 恍然大悟啊！
-//     this.FormVisible = true;
-//     users.push({ name: '', price: '',reserve:'',desc:''})
-//  },
-    // 点击新增
-    addRow(users,event) {
-      this.FormVisible = true;
-      this.Form = {
-        id: 0,
-        name: '',
-        price: 0,
-        reserve:'',
-        data:'',
-        desc: '',
-      };
-      this.dialogStatus = "addEquipment"
-      this.addBtnshow = true
-      this.editBtnshow = false
-    },
-    // 点击确定（新增）
-    confirmAdd() {
-      // this.users = this.users || []
-      this.users.push({
-        name: this.Form.name,
-        price: this.Form.price,
-        reserve: this.Form.reserve,
-        data: this.Form.data,
-        desc: this.Form.desc
-      })
-      // storage.set('users', this.users);
-      this.FormVisible = false;
-    },
-    //点击编辑
-    handleEdit:function(index, row) {
-      this.FormVisible = true;
-      this.Form = Object.assign({}, row); //这句是关键！！！
-      _index = index;
-      console.log(index);
-      console.log(_index);
-
-      this.dialogStatus = "editEquipment"
-      this.addBtnshow = false
-      this.editBtnshow = true
-    },
-    // 点击确定（编辑）
-    confirmEdit(){
-      var editdata = _index;
-      console.log(editdata);
-      this.users[editdata].name=this.Form.name;
-      this.users[editdata].price=this.Form.price;
-      this.users[editdata].reserve=this.Form.reserve;
-      this.users[editdata].data=this.Form.data;
-      this.users[editdata].desc=this.Form.desc;
-      this.FormVisible = false;
-      // 我的 更新的时候就把弹出来的表单中的数据写到要修改的表格中
-      // var postdata = {
-      //   name: this.Form.name,
-      //    price: this.Form.price,
-      //    reserve: this.Form.reserve,
-      //    data: this.Form.data,
-      //    desc: this.Form.desc,
-      // }
-      //这里再向后台发个post请求重新渲染表格数据
-      // this.$set(this.users,'name')
-      // let studenteList=this.Form;
-      // console.log(studenteList);
-      // let {name,price,reserve,data,desc} = studenteList;
+    onNodeClick(nodeObject, $event) {
+      console.log('onNodeClick:', nodeObject.text)
 
     },
-    //点击关闭dialog
-    handleClose(done) {
-      //  done();
-      //  location.reload();
-      this.FormVisible = false;
+    onLineClick(lineObject, $event) {
+      console.log('onLineClick:', lineObject)
     },
-    //点击取消
-    handleCancel(formName) {
-      this.FormVisible = false;
-    },
-    // 删除
-    handleDelete(index, row) {
-      console.log(index, row);
-      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.$message({
-          // delete:row.splice(index, 1),
-          type: 'success',
-          message: '删除成功!',
-          delete: row.splice(index, 1)   //splice 删除对象是数unfuntion组   如果是对象会出现错误  row.solice not is
+    setGraphData() {
+      // alert("ok1")
 
-          // url: this.$router.push('/')
-        });
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消删除'
-        });
-      });
-    },
-    removeUsers() {
-      this.$confirm('此操作将永久删除 ' + this.selected.length + ' 个用户, 是否继续?', '提示', { type: 'warning' })
-        .then(() => {
-          console.log(this.selected);
-          var ids = [];
-          //提取选中项的id
-          $.each(this.selected,(i, users)=> {
-            ids.push(users.id);
+      axios({
+        method: 'post',
+        url: process.env.VUE_APP_severURL + '/getPeopleRelation',
+        contentType: 'application/x-www-form-urlencoded',
+      }).then(resp => {
+        // alert("ok")
+        if (resp.data.code === 20000)
+          // alert(resp.data.data)
+          var __graph_json_data = resp.data.data
+          this.$refs.seeksRelationGraph.setJsonData(__graph_json_data, (seeksRGGraph) => {
+            // Called when the relation-graph is completed
+            // alert(seeksRGGraph)
+          })
+          this.$message({
+            message: '加载成功！',
+            type: 'success'
           });
-          // 向请求服务端删除
-          //  var resource = this.$resource(this.url);
-          resource.remove({ids: ids.join(",") })
-            .then((response) => {
-              this.$message.success('删除了' + this.selected.length + '个用户!');
-              this.getUsers();
-            })
-            .catch((response) => {
-              this.$message.error('删除失败!');
-            });
-        })
-        .catch(() => {
-          this.$Message('已取消操作!');
-        });
+      })
+
+
+
+      // var __graph_json_data = {
+      //   'rootId': 'N13',
+      //   'nodes': [{
+      //     'id': 'N1',
+      //     'text': '侯亮平',
+      //     'color': '#e83b78',
+      //     'borderColor': '#ff875e',
+      //     'innerHTML': '<div class="c-my-node" style="background-image: url(http://localhost:9000/statics/resource/head/Adam_H_Sterling.jpg);border:#ff875e solid 3px;"><div class="c-node-name" style="color:#ff875e">侯亮平</div></div>'
+      //   }, {
+      //     'id': 'N2',
+      //     'text': '李达康',
+      //     'color': '#ec6941',
+      //     'borderColor': '#ff875e',
+      //     'innerHTML': '<div class="c-my-node" style="background-image: url(https://dss0.baidu.com/6ONWsjip0QIZ8tyhnq/it/u=2677153550,2207805387&fm=58&app=83&f=JPEG?w=250&h=250&s=249039DDC2D153D411A851360300C062);border:#ff875e solid 3px;"><div class="c-node-name" style="color:#ff875e">李达康</div></div>'
+      //   }, {
+      //     'id': 'N3',
+      //     'text': '祁同伟',
+      //     'color': 'rgba(0, 206, 209, 1)',
+      //     'borderColor': '#6cc0ff',
+      //     'innerHTML': '<div class="c-my-node" style="background-image: url(https://dss1.baidu.com/6ONXsjip0QIZ8tyhnq/it/u=1725297532,1915921796&fm=58&app=83&f=JPEG?w=250&h=250&s=FE8EA444A60759554DAC1DBB03000092);border:#6cc0ff solid 3px;"><div class="c-node-name" style="color:#6cc0ff">祁同伟</div></div>'
+      //   }, {
+      //     'id': 'N4',
+      //     'text': '陈岩石',
+      //     'color': '#ec6941',
+      //     'borderColor': '#ff875e',
+      //     'innerHTML': '<div class="c-my-node" style="background-image: url(https://dss2.baidu.com/6ONYsjip0QIZ8tyhnq/it/u=2025797948,1615296290&fm=58&app=83&f=JPEG?w=250&h=250&s=B5B04C331F32739C4604F9F503007021);border:#ff875e solid 3px;"><div class="c-node-name" style="color:#ff875e">陈岩石</div></div>'
+      //   }, {
+      //     'id': 'N5',
+      //     'text': '陆亦可',
+      //     'color': '#ec6941',
+      //     'borderColor': '#ff875e',
+      //     'innerHTML': '<div class="c-my-node" style="background-image: url(https://dss1.baidu.com/6ONXsjip0QIZ8tyhnq/it/u=344720653,260255884&fm=58&app=83&f=JPEG?w=250&h=250&s=57B8AB676AE862941D94ED170300E060);border:#ff875e solid 3px;"><div class="c-node-name" style="color:#ff875e">陆亦可</div></div>'
+      //   }, {
+      //     'id': 'N6',
+      //     'text': '高育良',
+      //     'color': 'rgba(0, 206, 209, 1)',
+      //     'borderColor': '#6cc0ff',
+      //     'innerHTML': '<div class="c-my-node" style="background-image: url(https://dss0.baidu.com/6ONWsjip0QIZ8tyhnq/it/u=3098576865,849900134&fm=58&app=83&f=JPEG?w=250&h=250&s=EDE01A63A65917DC104509920300C0C1);border:#6cc0ff solid 3px;"><div class="c-node-name" style="color:#6cc0ff">高育良</div></div>'
+      //   }, {
+      //     'id': 'N7',
+      //     'text': '沙瑞金',
+      //     'color': '#ec6941',
+      //     'borderColor': '#ff875e',
+      //     'innerHTML': '<div class="c-my-node" style="background-image: url(https://dss0.baidu.com/6ONWsjip0QIZ8tyhnq/it/u=3722686698,2547355567&fm=58&app=83&f=JPEG?w=250&h=250&s=BF8A356E04E1B2BCEFA45D860100E0E1);border:#ff875e solid 3px;"><div class="c-node-name" style="color:#ff875e">沙瑞金</div></div>'
+      //   }, {
+      //     'id': 'N8',
+      //     'text': '高小琴',
+      //     'color': 'rgba(0, 206, 209, 1)',
+      //     'borderColor': '#6cc0ff',
+      //     'innerHTML': '<div class="c-my-node" style="background-image: url(https://dss2.baidu.com/6ONYsjip0QIZ8tyhnq/it/u=4266886844,1791850012&fm=58&s=66B01AC758BB67960834B8FA0300C011);border:#6cc0ff solid 3px;"><div class="c-node-name" style="color:#6cc0ff">高小琴</div></div>'
+      //   }, {
+      //     'id': 'N9',
+      //     'text': '高小凤',
+      //     'color': 'rgba(0, 206, 209, 1)',
+      //     'borderColor': '#6cc0ff',
+      //     'innerHTML': '<div class="c-my-node" style="background-image: url(https://dss1.baidu.com/6ONXsjip0QIZ8tyhnq/it/u=2747443453,2680399969&fm=58&app=83&f=JPEG?w=150&h=150&s=DB8828C1562265150814ADFE03007012);border:#6cc0ff solid 3px;"><div class="c-node-name" style="color:#6cc0ff">高小凤</div></div>'
+      //   }, {
+      //     'id': 'N10',
+      //     'text': '赵东来',
+      //     'color': '#ec6941',
+      //     'borderColor': '#ff875e',
+      //     'innerHTML': '<div class="c-my-node" style="background-image: url(https://dss2.baidu.com/6ONYsjip0QIZ8tyhnq/it/u=3301823375,1282024443&fm=58&app=83&f=JPG?w=250&h=250&s=2BC2834F2C22A25D12C06CA80300E013);border:#ff875e solid 3px;"><div class="c-node-name" style="color:#ff875e">赵东来</div></div>'
+      //   }, {
+      //     'id': 'N11',
+      //     'text': '程度',
+      //     'color': 'rgba(0, 206, 209, 1)',
+      //     'borderColor': '#6cc0ff',
+      //     'innerHTML': '<div class="c-my-node" style="background-image: url(https://dss1.baidu.com/6ONXsjip0QIZ8tyhnq/it/u=134233720,666111889&fm=58&app=83&f=JPG?w=250&h=250&s=4DE5A844801F1BD461E039A20300C0C3);border:#6cc0ff solid 3px;"><div class="c-node-name" style="color:#6cc0ff">程度</div></div>'
+      //   }, {
+      //     'id': 'N12',
+      //     'text': '吴惠芬',
+      //     'color': '#ec6941',
+      //     'borderColor': '#ff875e',
+      //     'innerHTML': '<div class="c-my-node" style="background-image: url(https://dss2.baidu.com/6ONYsjip0QIZ8tyhnq/it/u=1215039713,3597142764&fm=58&app=83&f=JPEG?w=250&h=250&s=1A20E0018E3B6E9CD10C7DA30300E081);border:#ff875e solid 3px;"><div class="c-node-name" style="color:#ff875e">吴惠芬</div></div>'
+      //   }, {
+      //     'id': 'N13',
+      //     'text': '赵瑞龙',
+      //     'color': 'rgba(0, 206, 209, 1)',
+      //     'borderColor': '#6cc0ff',
+      //     'innerHTML': '<div class="c-my-node" style="background-image: url(https://dss2.baidu.com/6ONYsjip0QIZ8tyhnq/it/u=1140839330,2922201597&fm=58&app=83&f=JPEG?w=250&h=250&s=CDF9A844D45AB87512C8508B0100F080);border:#6cc0ff solid 3px;"><div class="c-node-name" style="color:#6cc0ff">赵瑞龙</div></div>'
+      //   }, {
+      //     'id': 'N14',
+      //     'text': '赵立春',
+      //     'color': 'rgba(0, 206, 209, 1)',
+      //     'borderColor': '#6cc0ff',
+      //     'innerHTML': '<div class="c-my-node" style="background-image: url(https://dss1.baidu.com/6ONXsjip0QIZ8tyhnq/it/u=2110325119,1633583088&fm=58&app=83&f=JPEG?w=120&h=120&s=971E35C05A43305DCA7C1C0B030080C);border:#6cc0ff solid 3px;"><div class="c-node-name" style="color:#6cc0ff">赵立春</div></div>'
+      //   }, {
+      //     'id': 'N15',
+      //     'text': '陈海',
+      //     'color': '#ec6941',
+      //     'borderColor': '#ff875e',
+      //     'innerHTML': '<div class="c-my-node" style="background-image: url(https://dss0.baidu.com/6ONWsjip0QIZ8tyhnq/it/u=1416498138,2265298708&fm=58&app=83&f=JPEG?w=250&h=250&s=F906CF1C0E1356D046AC3CEB0300B0A0);border:#ff875e solid 3px;"><div class="c-node-name" style="color:#ff875e">陈海</div></div>'
+      //   }, {
+      //     'id': 'N16',
+      //     'text': '梁璐',
+      //     'color': '#ec6941',
+      //     'borderColor': '#ff875e',
+      //     'innerHTML': '<div class="c-my-node" style="background-image: url(https://dss0.baidu.com/6ONWsjip0QIZ8tyhnq/it/u=3749144697,3456463661&fm=58&app=83&f=JPEG?w=250&h=250&s=783823D3FE621E94138CC08B030070C2);border:#ff875e solid 3px;"><div class="c-node-name" style="color:#ff875e">梁璐</div></div>'
+      //   }, {
+      //     'id': 'N17',
+      //     'text': '刘新建',
+      //     'color': 'rgba(0, 206, 209, 1)',
+      //     'borderColor': '#6cc0ff',
+      //     'innerHTML': '<div class="c-my-node" style="background-image: url(https://dss2.baidu.com/6ONYsjip0QIZ8tyhnq/it/u=2263876103,310235844&fm=58&app=83&f=JPEG?w=250&h=250&s=6CE2A944CC1223DC632CC09203009082);border:#6cc0ff solid 3px;"><div class="c-node-name" style="color:#6cc0ff">刘新建</div></div>'
+      //   }, {
+      //     'id': 'N18',
+      //     'text': '欧阳菁',
+      //     'color': 'rgba(0, 206, 209, 1)',
+      //     'borderColor': '#6cc0ff',
+      //     'innerHTML': '<div class="c-my-node" style="background-image: url(https://dss2.baidu.com/6ONYsjip0QIZ8tyhnq/it/u=3590139977,3135325708&fm=58&app=83&f=JPEG?w=250&h=250&s=2F1C8B46C4A214BCE100A81A03004091);border:#6cc0ff solid 3px;"><div class="c-node-name" style="color:#6cc0ff">欧阳菁</div></div>'
+      //   }, {
+      //     'id': 'N19',
+      //     'text': '吴心怡',
+      //     'color': '#ec6941',
+      //     'borderColor': '#ff875e',
+      //     'innerHTML': '<div class="c-my-node" style="background-image: url(https://dss1.baidu.com/6ONXsjip0QIZ8tyhnq/it/u=2110325119,1633583088&fm=58&app=83&f=JPEG?w=120&h=120&s=971E35C05A43305DCA7C1C0B030080C);border:#ff875e solid 3px;"><div class="c-node-name" style="color:#ff875e">吴心怡</div></div>'
+      //   }, {
+      //     'id': 'N20',
+      //     'text': '蔡成功',
+      //     'color': 'rgba(0, 206, 209, 1)',
+      //     'borderColor': '#6cc0ff',
+      //     'innerHTML': '<div class="c-my-node" style="background-image: url(https://dss1.baidu.com/6ONXsjip0QIZ8tyhnq/it/u=4153440298,254451173&fm=58&app=83&f=JPEG?w=250&h=250&s=07C2B4488C42D355548CC41F010080D1);border:#6cc0ff solid 3px;"><div class="c-node-name" style="color:#6cc0ff">蔡成功</div></div>'
+      //   }, {
+      //     'id': 'N21',
+      //     'text': '丁义珍',
+      //     'color': 'rgba(0, 206, 209, 1)',
+      //     'borderColor': '#6cc0ff',
+      //     'innerHTML': '<div class="c-my-node" style="background-image: url(https://dss0.baidu.com/6ONWsjip0QIZ8tyhnq/it/u=842795163,1346447987&fm=58&app=83&f=JPEG?w=250&h=250&s=2BC3736EE499247D41C0B4820100E093);border:#6cc0ff solid 3px;"><div class="c-node-name" style="color:#6cc0ff">丁义珍</div></div>'
+      //   }],
+      //   'links': [{'from': 'N6', 'to': 'N1', 'text': '师生', 'color': '#d2c0a5', 'fontColor': '#d2c0a5'}, {
+      //     'from': 'N6',
+      //     'to': 'N3',
+      //     'text': '师生',
+      //     'color': '#d2c0a5',
+      //     'fontColor': '#d2c0a5'
+      //   }, {'from': 'N14', 'to': 'N6', 'text': '前领导', 'color': '#d2c0a5', 'fontColor': '#d2c0a5'}, {
+      //     'from': 'N14',
+      //     'to': 'N13',
+      //     'text': '父子',
+      //     'color': '#d2c0a5',
+      //     'fontColor': '#d2c0a5'
+      //   }, {'from': 'N14', 'to': 'N17', 'text': '前部队下属', 'color': '#d2c0a5', 'fontColor': '#d2c0a5'}, {
+      //     'from': 'N2',
+      //     'to': 'N14',
+      //     'text': '前任秘书',
+      //     'color': '#d2c0a5',
+      //     'fontColor': '#d2c0a5'
+      //   }, {'from': 'N3', 'to': 'N8', 'text': '情人', 'color': '#d2c0a5', 'fontColor': '#d2c0a5'}, {
+      //     'from': 'N4',
+      //     'to': 'N15',
+      //     'text': '父子',
+      //     'color': '#d2c0a5',
+      //     'fontColor': '#d2c0a5'
+      //   }, {'from': 'N5', 'to': 'N15', 'text': '属下', 'color': '#d2c0a5', 'fontColor': '#d2c0a5'}, {
+      //     'from': 'N7',
+      //     'to': 'N4',
+      //     'text': '故人',
+      //     'color': '#d2c0a5',
+      //     'fontColor': '#d2c0a5'
+      //   }, {'from': 'N3', 'to': 'N15', 'text': '师哥', 'color': '#d2c0a5', 'fontColor': '#d2c0a5'}, {
+      //     'from': 'N3',
+      //     'to': 'N1',
+      //     'text': '师哥',
+      //     'color': '#d2c0a5',
+      //     'fontColor': '#d2c0a5'
+      //   }, {'from': 'N1', 'to': 'N15', 'text': '同学，生死朋友', 'color': '#d2c0a5', 'fontColor': '#d2c0a5'}, {
+      //     'from': 'N6',
+      //     'to': 'N12',
+      //     'text': '夫妻',
+      //     'color': '#d2c0a5',
+      //     'fontColor': '#d2c0a5'
+      //   }, {'from': 'N15', 'to': 'N10', 'text': '朋友', 'color': '#d2c0a5', 'fontColor': '#d2c0a5'}, {
+      //     'from': 'N8',
+      //     'to': 'N9',
+      //     'text': '双胞胎',
+      //     'color': '#d2c0a5',
+      //     'fontColor': '#d2c0a5'
+      //   }, {'from': 'N10', 'to': 'N5', 'text': '爱慕', 'color': '#d2c0a5', 'fontColor': '#d2c0a5'}, {
+      //     'from': 'N3',
+      //     'to': 'N11',
+      //     'text': '领导',
+      //     'color': '#d2c0a5',
+      //     'fontColor': '#d2c0a5'
+      //   }, {'from': 'N6', 'to': 'N9', 'text': '情人', 'color': '#d2c0a5', 'fontColor': '#d2c0a5'}, {
+      //     'from': 'N13',
+      //     'to': 'N3',
+      //     'text': '勾结',
+      //     'color': '#d2c0a5',
+      //     'fontColor': '#d2c0a5'
+      //   }, {'from': 'N2', 'to': 'N10', 'text': '领导', 'color': '#d2c0a5', 'fontColor': '#d2c0a5'}, {
+      //     'from': 'N13',
+      //     'to': 'N11',
+      //     'text': '领导',
+      //     'color': '#d2c0a5',
+      //     'fontColor': '#d2c0a5'
+      //   }, {'from': 'N7', 'to': 'N2', 'text': '领导', 'color': '#d2c0a5', 'fontColor': '#d2c0a5'}, {
+      //     'from': 'N7',
+      //     'to': 'N6',
+      //     'text': '领导',
+      //     'color': '#d2c0a5',
+      //     'fontColor': '#d2c0a5'
+      //   }, {'from': 'N3', 'to': 'N16', 'text': '夫妻', 'color': '#d2c0a5', 'fontColor': '#d2c0a5'}, {
+      //     'from': 'N12',
+      //     'to': 'N16',
+      //     'text': '朋友',
+      //     'color': '#d2c0a5',
+      //     'fontColor': '#d2c0a5'
+      //   }, {'from': 'N2', 'to': 'N18', 'text': '夫妻', 'color': '#d2c0a5', 'fontColor': '#d2c0a5'}, {
+      //     'from': 'N13',
+      //     'to': 'N17',
+      //     'text': '洗钱工具',
+      //     'color': '#d2c0a5',
+      //     'fontColor': '#d2c0a5'
+      //   }, {'from': 'N13', 'to': 'N8', 'text': '勾结，腐化', 'color': '#d2c0a5', 'fontColor': '#d2c0a5'}, {
+      //     'from': 'N13',
+      //     'to': 'N9',
+      //     'text': '腐化',
+      //     'color': '#d2c0a5',
+      //     'fontColor': '#d2c0a5'
+      //   }, {'from': 'N19', 'to': 'N5', 'text': '母女', 'color': '#d2c0a5', 'fontColor': '#d2c0a5'}, {
+      //     'from': 'N19',
+      //     'to': 'N12',
+      //     'text': '姐妹',
+      //     'color': '#d2c0a5',
+      //     'fontColor': '#d2c0a5'
+      //   }, {'from': 'N20', 'to': 'N1', 'text': '发小', 'color': '#d2c0a5', 'fontColor': '#d2c0a5'}, {
+      //     'from': 'N20',
+      //     'to': 'N18',
+      //     'text': '举报',
+      //     'color': '#ed724d',
+      //     'fontColor': '#ed724d'
+      //   }, {'from': 'N18', 'to': 'N17', 'text': '举报', 'color': '#ed724d', 'fontColor': '#ed724d'}, {
+      //     'from': 'N17',
+      //     'to': 'N13',
+      //     'text': '举报',
+      //     'color': '#ed724d',
+      //     'fontColor': '#ed724d'
+      //   }, {'from': 'N2', 'to': 'N21', 'text': '领导', 'color': '#d2c0a5', 'fontColor': '#d2c0a5'}, {
+      //     'from': 'N8',
+      //     'to': 'N21',
+      //     'text': '策划出逃',
+      //     'color': '#d2c0a5',
+      //     'fontColor': '#d2c0a5'
+      //   }, {'from': 'N3', 'to': 'N21', 'text': '勾结', 'color': '#d2c0a5', 'fontColor': '#d2c0a5'}, {
+      //     'from': 'N13',
+      //     'to': 'N21',
+      //     'text': '勾结',
+      //     'color': '#d2c0a5',
+      //     'fontColor': '#d2c0a5'
+      //   }]
+      // }
+      // this.$refs.seeksRelationGraph.setJsonData(__graph_json_data, (seeksRGGraph) => {
+      //   // 这些写上当图谱初始化完成后需要执行的代码
+      // })
     }
-  },
+  }
 }
 </script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
+.c-my-node{
+  background-position: center center;
+  background-size: 100%;
+  border:#ff8c00 solid 2px;
+  height:80px;
+  width:80px;
+  border-radius: 40px;
+}
+.c-node-name{
+  width:160px;margin-left:-40px;text-align:center;margin-top:85px;
+}
 </style>
