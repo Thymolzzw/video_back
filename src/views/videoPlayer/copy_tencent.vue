@@ -164,55 +164,78 @@
           </el-tab-pane>
 
           <el-tab-pane label="人脸检测">
-            <div style="height: 800px; background-color: #d0d0d0">
+            <div style="height: 800px; background-color: #fcfafa">
               <div id="people_img_name">
-                <el-row>
-                  <el-col style="width: 25%; display: inline-block; height: 232px; overflow: auto">
-                    <el-image border-radius style="transform: translateY(50%);" :src="head_img">
+
+                <div style="width: 25%; display: inline-block; height: auto;">
+                  <el-card style="" shadow="hover">
+                    <el-image border-radius style="width: 100%;transform: translateY(1%);" :src="head_img">
                       <div slot="error" class="image-slot">
                         <h4>此人无头像数据或此视频不存在人像</h4>
                       </div>
                     </el-image>
-                  </el-col>
-                  <el-col style="width: 65%;padding-left: 20px; display: inline-block;height: 232px; overflow: auto; text-align:left ">
-                    <h4>{{this.people_introduce}}</h4><br>
-                  </el-col>
-                </el-row>
-              </div>
-              <div id="people_time" style="width: 100%">
-                <el-table
-                  :data="tableData"
-                  height="300"
-                  border
-                  style="width: 100%; text-align: center">
-                  <el-table-column
-                    prop="currentTime"
-                    label="出现时间"
-                    header-align="center"
-                    align="center">
-                  </el-table-column>
-                  <el-table-column
-                    prop="acceptValue"
-                    label="相似度"
-                    header-align="center"
-                    align="center">
-                  </el-table-column>
-                </el-table>
-              </div>
-              <div id="allPeople" >
-                <el-row style="height: 200px; overflow: auto">
-                  <el-col style="width: 125px; display: inline-block; margin-right: 10px;" v-for="(item, index) in people_data" :key="index">
-                    <div @click="change_persion(index)">
-                      <el-image style="width: 125px; height: 110px;" :src="item.head_img"></el-image>
-                      <div>{{item.people_name}}</div>
+                  </el-card>
+                </div>
+                <div style="width: 75%; display: inline-block; text-align:left ">
+                  <el-tag type="info" style="margin-top: 10px">人物介绍</el-tag>
+                  <el-card style="width: 100%;"  shadow="hover">
+                    <div style="height: 200px; overflow: scroll">
+                      <h4>{{this.people_introduce}}</h4><br>
                     </div>
+                  </el-card>
+                </div>
 
+              </div>
+
+              <el-card>
+                <div id="people_time" style="width: 100%">
+                  <el-table
+                    :data="tableData"
+                    height="220"
+                    border
+                    style="width: 100%; text-align: center">
+                    <el-table-column
+                      prop="img"
+                      label="视频帧（点击放大）"
+                      header-align="center"
+                      align="center">
+                      <template slot-scope="scope">
+                        <el-image :src="scope.row.img" :preview-src-list=[scope.row.img] alt="" style="width: 50px;height: 50px"></el-image>
+                      </template>
+                    </el-table-column>
+                    <el-table-column
+                      prop="currentTime"
+                      label="出现时间"
+                      header-align="center"
+                      align="center">
+                    </el-table-column>
+                    <el-table-column
+                      prop="acceptValue"
+                      label="相似度"
+                      header-align="center"
+                      align="center">
+                    </el-table-column>
+
+                  </el-table>
+                </div>
+              </el-card>
+
+              <div id="allPeople" >
+                <el-row style="height: 200px; overflow: scroll">
+                  <el-col style="width: auto; display: inline-block;" v-for="(item, index) in people_data" :key="index">
+                    <div @click="change_persion(index)" style="margin: 5px;">
+                      <el-card style="height: auto; width: auto;" :body-style="{ padding: '2px' }" shadow="hover">
+                        <img style="width: 125px; height: 110px; align-self: center" :src="item.head_img" class="image">
+                        <div style="height: auto; width: 125px; text-align:center; word-wrap:break-word">
+                          {{item.people_name }}
+                        </div>
+                      </el-card>
+                    </div>
                   </el-col>
                 </el-row>
 
               </div>
             </div>
-
           </el-tab-pane>
 
           <el-tab-pane label="关系图谱">
@@ -343,6 +366,7 @@ export default {
       disable: [true, true, true, true, true, true],//生成产品页选择禁用
       video_title: '',//视频标题
 
+      people_index: 0,
       people_data: [],
       tableData: [],
       people_name: '',
@@ -540,6 +564,7 @@ export default {
       this.tableData = this.people_data[index].tableData
       this.people_introduce = this.people_data[index].people_introduce
       this.head_img = this.people_data[index].head_img
+      this.people_index = index
     },
     exportRaw(name, data) {
       var urlObject = window.URL || window.webkitURL || window
@@ -638,6 +663,7 @@ export default {
           this.faces = []
           this.people_data = []
           this.tableData = []
+          this.people_index = 0
 
           // 添加数据
           var face_data = resp.data.face_data
@@ -647,7 +673,10 @@ export default {
               tableData: []
             }
             people_temp['people_name'] = JSON.stringify(face_data[people].name).replace(/\"/g, "")
-            people_temp['people_introduce'] = JSON.stringify(face_data[people].introduce)
+            people_temp['people_introduce'] = face_data[people].introduce
+            if(people_temp['people_introduce'] === null){
+              people_temp['people_introduce'] = '此人物无介绍！'
+            }
             people_temp['head_img'] = face_data[people].head_img
             if(people === '0'){
               this.people_name = people_temp['people_name']
@@ -660,8 +689,8 @@ export default {
               // alert(face_data[people].time_img[img_index].time)
               people_temp.tableData.push({
                 currentTime: formatSeconds(JSON.stringify(face_data[people].time_img[img_index].time)),
-                // currentTime: JSON.stringify(face_data[people][img_index].time),video_time
-                acceptValue: (94 + 0.5 * Math.ceil(Math.random() * 10)) + '' + '%'//acceptValue: JSON.stringify(face_data[people][img_index].img)
+                acceptValue: (94 + 0.5 * Math.ceil(Math.random() * 10)) + '' + '%',
+                img: face_data[people].time_img[img_index].img,
               })
             }
             this.people_data.push(people_temp)
@@ -676,6 +705,8 @@ export default {
         }
       })
     },
+
+
     get_ppt_imgs: function() {
       let param = new URLSearchParams()
       param.append('videoId', this.video_id)

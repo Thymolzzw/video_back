@@ -18,17 +18,23 @@
     <div>
       <div style="height: 800px; background-color: #fcfafa">
         <div id="people_img_name">
+
           <div style="width: 25%; display: inline-block; height: auto;">
-            <el-card style="height: auto; width: auto;" :body-style="{ padding: '2px' }" shadow="hover">
-              <el-image border-radius style="height: 180px; width: auto;transform: translateY(1%);" :src="head_img">
+            <el-card style="" shadow="hover">
+              <el-image border-radius style="width: 100%;transform: translateY(1%);" :src="head_img">
                 <div slot="error" class="image-slot">
                   <h4>此人无头像数据或此视频不存在人像</h4>
                 </div>
               </el-image>
             </el-card>
           </div>
-          <div style="width: 75%;padding-left: 20px; display: inline-block;height: 180px; overflow: scroll; text-align:left ">
-            <h4>{{this.people_introduce}}</h4><br>
+          <div style="width: 75%; display: inline-block;height: auto; text-align:left ">
+            <el-tag  type="info" style="margin-top: 10px">人物介绍</el-tag>
+            <el-card style="width: 100%;"  shadow="hover">
+              <div style="height: 200px; overflow: scroll">
+                <h4>{{this.people_introduce}}</h4><br>
+              </div>
+            </el-card>
           </div>
 
         </div>
