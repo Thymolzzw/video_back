@@ -6,7 +6,6 @@
         v-loading=true
         element-loading-text="拼命加载中"
         element-loading-spinner="el-icon-loading">
-<!--        element-loading-background="rgba(0, 0, 0, 0.8)"-->
       </el-table>
 
     </el-dialog>
@@ -179,7 +178,6 @@
                     <h4>{{this.people_introduce}}</h4><br>
                   </el-col>
                 </el-row>
-<!--                <h4>我是一个时间轴！</h4>-->
               </div>
               <div id="people_time" style="width: 100%">
                 <el-table
@@ -192,7 +190,6 @@
                     label="出现时间"
                     header-align="center"
                     align="center">
-<!--                    在此添加点击跳转-->
                   </el-table-column>
                   <el-table-column
                     prop="acceptValue"
@@ -290,7 +287,6 @@ export default {
     return {
       // 图谱
       g_loading: true,
-      demoname: '---',
       graphOptions: {
         defaultNodeBorderWidth: 0,
         defaultNodeColor: 'rgba(238, 178, 94, 1)',
@@ -323,11 +319,10 @@ export default {
       surface_product_num: 0,//平面产品打印份数
       ocr_src: '',//自然场景文本产品地址
       like_color: '#000000',
-      // video_text: '',
+
       subtitle: '',//展示在视频中的字幕
       txt_subtitle: '',//txt字幕文件地址
-      // renlian: '',
-      // txt_subtitle_arr: [],
+
       equipment_json_data: '',
       equipment_json_data_time:[],
       video_all_time: '',
@@ -375,14 +370,12 @@ export default {
           fullscreenToggle: true  //全屏按钮
         }
       }
-
     }
   },
   mounted() {
     // 图谱
-    this.demoname = this.$route.params.demoname
+    // this.demoname = this.$route.params.demoname
     // this.setGraphData()
-
 
     this.video_id = this.$route.query.video_id
     if (this.video_id === undefined) {
@@ -397,7 +390,6 @@ export default {
     this.get_faces()
     this.get_voice()
     this.get_equipment_data()
-
 
   },
   methods: {
@@ -415,11 +407,14 @@ export default {
     onLineClick(lineObject, $event) {
       console.log('onLineClick:', lineObject)
     },
-    setGraphData(videoId) {
+    setGraphData() {
+      let param = new FormData()
+      param.append('videoId', this.video_id)
       axios({
         method: 'post',
         url: process.env.VUE_APP_severURL + '/getPeopleRelation',
         contentType: 'application/x-www-form-urlencoded',
+        data: param,
       }).then(resp => {
         if (resp.data.code === 20000){
           // console.log('resp.data.data', resp.data.data)
