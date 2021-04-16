@@ -416,9 +416,19 @@ export default {
     // 图谱
     onNodeClick(nodeObject, $event) {
       console.log('onNodeClick:', nodeObject.text)
+      const h = this.$createElement;
+      this.$notify({
+        title: '节点信息',
+        message: h('i', { style: 'color: teal'}, '节点名称：' + nodeObject.text)
+      });
     },
     onLineClick(lineObject, $event) {
       console.log('onLineClick:', lineObject)
+      const h = this.$createElement;
+      this.$notify({
+        title: '线条信息',
+        message: h('i', { style: 'color: teal'}, '关系名称：' + lineObject.relations[0].text)
+      });
     },
     setGraphData() {
       let param = new FormData()
