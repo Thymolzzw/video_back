@@ -14,6 +14,7 @@ cd video_back
 
 # install dependency
 npm install
+npm install --save relation-graph
 
 # develop
 npm run dev
