@@ -28,9 +28,8 @@
             <track style="width: 200px;" kind="captions" :src=subtitle srclang="en" label="English"/>
           </video-player>
         </div>
-<!--        <p style="display: block">^_^</p>-->
+
         <div id="likes">
-<!--          <i @click="add_likes()" :style="{display:inline-block,  color: like_color }" class="el-icon-thumb">点赞</i>-->
           <el-button size="small" type="primary" icon="el-icon-thumb" @click="add_likes" circle></el-button>
           <el-button size="small" type="primary" icon="el-icon-share" circle @click="share_video"></el-button>
         </div>
@@ -79,13 +78,7 @@
             <h4 style="text-align: left">请选择要导出的产品：</h4>
             <div id="functions_group">
               <el-checkbox-group v-model="function_checkList" :max="1">
-<!--                <el-checkbox label="-1" disabled>视频信息</el-checkbox>-->
-<!--                <el-checkbox label="0" :disabled = disable[0]>人脸识别</el-checkbox>-->
-<!--                <el-checkbox label="1" :disabled = disable[1]>目标检测与识别</el-checkbox>-->
-<!--                <el-checkbox label="2" :disabled = disable[2]>PPT画面检测</el-checkbox>-->
-<!--                <el-checkbox label="3" :disabled = disable[3]>自然场景文本识别</el-checkbox>-->
-<!--                <el-checkbox label="4" :disabled = disable[4]>语音识别与翻译</el-checkbox>-->
-<!--                <el-checkbox label="5" :disabled = disable[5]>声纹识别</el-checkbox>-->
+
                 <el-checkbox label="6" :disabled=disable[3]>研讨视频报告</el-checkbox>
                 <el-checkbox label="7" :disabled=disable[2]>PPT画面转PDF文件</el-checkbox>
                 <el-checkbox label="8" :checked="surface_product">平面产品</el-checkbox>
@@ -96,31 +89,19 @@
             <el-button style="width: 100%; margin-top: 20px" type="primary" @click="export_product()">导出产品</el-button>
           </div>
 
-<!--          <el-row style="margin-top: 20px;">     :disabled="surface_product"-->
-<!--            <el-col :span="4">-->
-<!--              <el-tag type="info">视频国家</el-tag>-->
-<!--            </el-col>-->
-<!--&lt;!&ndash;            <el-col :span="3">&ndash;&gt;-->
-<!--              <el-input type="textarea">-->
-<!--                {{addition_data.country_name}}-->
-<!--              </el-input>-->
-<!--&lt;!&ndash;            </el-col>&ndash;&gt;-->
-<!--          </el-row>-->
-
         </div>
       </div>
       <div style="width: 40%; display: inline-block;vertical-align:top; margin-left: 4%;margin-top: 0px;">
-<!--        <img src="/Users/cuiky/Downloads/f01c15bb73e1ef3793e64e6b7bbccjpeg.jpeg" />type="border-card"-->
-        <el-tabs id="videoTabs" style="width: 100%">
+        <el-tabs id="videoTabs" style="width: 100%" @tab-click="handleClick">
           <el-tab-pane style="text-align: left" label="视频信息">
-            <p><h4 style="display: inline">视频标题：</h4>{{video_title}}</p>
-            <p><h4 style="display: inline">视频来源：</h4>{{addition_data.source_name}}</p>
-            <p><h4 style="display: inline">来源简介：</h4>{{addition_data.source_intro}}</p>
-            <p><h4 style="display: inline">视频时长：</h4>{{video_all_time}}</p>
-            <p><h4 style="display: inline">文件大小：</h4>{{addition_data.video_file_size}}</p>
-            <p><h4 style="display: inline">视频帧率：</h4>{{addition_data.video_fps}} fps</p>
-            <p><h4 style="display: inline">分辨率：</h4>{{addition_data.video_frame_width}} x {{addition_data.video_frame_height}}</p>
-            <p><h4 style="display: inline">视频比例：</h4>{{addition_data.video_frame_proportion}}</p>
+            <h4 style="display: inline">视频标题：</h4>{{video_title}}
+            <p><h4 style="display: inline">视频来源：</h4>{{addition_data.source_name}}
+            <p><h4 style="display: inline">来源简介：</h4>{{addition_data.source_intro}}
+            <p><h4 style="display: inline">视频时长：</h4>{{video_all_time}}
+            <p><h4 style="display: inline">文件大小：</h4>{{addition_data.video_file_size}}
+            <p><h4 style="display: inline">视频帧率：</h4>{{addition_data.video_fps}} fps
+            <p><h4 style="display: inline">分辨率：</h4>{{addition_data.video_frame_width}} x {{addition_data.video_frame_height}}
+            <p><h4 style="display: inline">视频比例：</h4>{{addition_data.video_frame_proportion}}
           </el-tab-pane>
 
           <el-tab-pane label="目标检测"
@@ -163,13 +144,11 @@
 
 
           <el-tab-pane label="文本识别">
-<!--            <el-button type="primary" v-on:click="downloadPdf('wenben')">导出pdf</el-button>-->
             <div ref="wenben" style="max-height: 688px; overflow: auto">
               <div style="width: 100%; height: auto; border-bottom: 2px solid" v-for="(item, index) in textarea"
                    :key="index"
               >
                 <div style="width: 33%;display: inline-block;">
-<!--                  图{{ index + 1 }}-->
                   <el-image :preview-src-list=[item.image] :src=item.image></el-image>
                 </div>
                 <div style="width: 67%; display: inline-block">
@@ -239,10 +218,14 @@
 
           </el-tab-pane>
 
-<!--          <el-tab-pane label="声纹识别">-->
-<!--            <h3>请选择需要语音识别的范围</h3>-->
-
-<!--          </el-tab-pane>-->
+          <el-tab-pane label="关系图谱">
+            <div>
+              <div style="margin-top:50px;width: calc(100% - 10px);height:calc(100vh - 140px);">
+                <SeeksRelationGraph ref="seeksRelationGraph" :options="graphOptions" :on-node-click="onNodeClick"
+                                    :on-line-click="onLineClick"/>
+              </div>
+            </div>
+          </el-tab-pane>
 
           <el-tab-pane label="语音识别">
             <el-button style="margin-left: 0px;" type="primary" v-on:click="exportRaw('template.txt',textarea1)">导出TXT文本</el-button>
@@ -261,14 +244,12 @@
 
           <el-tab-pane label="研讨场景PPT检测">
             <el-button style="margin-bottom: 10px;" type="primary" @click="get_ppt_pdf_path">点击下载PDF文件</el-button>
-<!--            <el-row>-->
               <div style=" height: 700px; max-height: 620px;overflow:auto;">
                 <div style="width: 500px; display: inline-block; float: left;"
                      v-for="(item, index) in ppt_imgs" :key="index">
                   <el-image fit="fill" :src="item" ></el-image>
                 </div>
               </div>
-<!--            </el-row>-->
           </el-tab-pane>
 
           <el-tab-pane label="声纹检测">
@@ -299,11 +280,35 @@ import axios from 'axios'
 import html2canvas from 'html2canvas'
 import jspdf from 'jspdf'
 import { formatSeconds } from '@/api/time'
+import SeeksRelationGraph from "relation-graph";
+
 
 export default {
-  name: 'index',
+  name: 'SeeksRelationGraphDemo',
+  components: { SeeksRelationGraph },
   data() {
     return {
+      // 图谱
+      g_loading: true,
+      demoname: '---',
+      graphOptions: {
+        defaultNodeBorderWidth: 0,
+        defaultNodeColor: 'rgba(238, 178, 94, 1)',
+        allowSwitchLineShape: true,
+        allowSwitchJunctionPoint: true,
+        defaultLineShape: 1,
+        'layouts': [
+          {
+            'label': '自动布局',
+            'layoutName': 'force',
+            'layoutClassName': 'seeks-layout-force'
+          }
+        ],
+        defaultJunctionPoint: 'border'
+        // 这里可以参考"Graph 图谱"中的参数进行设置
+      },
+
+
       all_functions:['人脸识别', '目标检测与识别', 'PPT画面检测', '自然场景文本识别', '语音识别与翻译', '声纹识别'],
       cur: 0,//无用
       dialogInfoVisible: true, //视频信息加载loading
@@ -335,17 +340,7 @@ export default {
       function_checkList: [],//生成产品页选择'-1'
       disable: [true, true, true, true, true, true],//生成产品页选择禁用
       video_title: '',//视频标题
-      // people_data: [
-      //   {
-      //     tableData: [{
-      //       currentTime: '',
-      //       acceptValue: ''
-      //     }],
-      //     people_name: '',
-      //     people_introduce: '',
-      //     head_img: '',
-      //   }
-      // ],
+
       people_data: [],
       tableData: [],
       people_name: '',
@@ -355,8 +350,7 @@ export default {
       fun_list: [],//已有操作编号列表：0，1，2，3，4，5
       shengwen_text: '',
 
-      // value1: [new Date(2016, 9, 1, 0, 0, 0), new Date(2016, 9, 1, 0, 1, 0)],
-      // new Date(2016, 9, 1, 0, 0, 0)
+
       playerOptions: {
         playbackRates: [0.75, 1.0, 1.5, 2.0], //播放速度
         autoplay: true, //如果true,浏览器准备好时开始回放。
@@ -366,9 +360,6 @@ export default {
         language: 'zh-CN',
         aspectRatio: '16:9', // 将播放器置于流畅模式，并在计算播放器的动态大小时使用该值。值应该代表一个比例 - 用冒号分隔的两个数字（例如"16:9"或"4:3"）
         fluid: true, // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
-        // html5: {
-        //   nativeTextTracks: true
-        // },
         textTrackSetting: true,
         sources: [{
           type: 'video/mp4', // 这里的种类支持很多种：基本视频格式、直播、流媒体等，具体可以参看git网址项目
@@ -388,7 +379,11 @@ export default {
     }
   },
   mounted() {
-    // this.$refs.videoPlayer.player.src(this.$route.query.video_url)
+    // 图谱
+    this.demoname = this.$route.params.demoname
+    // this.setGraphData()
+
+
     this.video_id = this.$route.query.video_id
     if (this.video_id === undefined) {
       this.video_id = 1
@@ -402,21 +397,50 @@ export default {
     this.get_faces()
     this.get_voice()
     this.get_equipment_data()
+
+
   },
   methods: {
-    // onPlayerPlay($event) {
-    //   this.$refs.videoPlayer.player.addRemoteTextTrack({ src: 'statics/resource/audio_text/lesson1.vtt', kind: 'subtitles', srclang: 'ru',
-    //     label: 'en', mode: 'showing' }, false);
-    //
-    // },
+    handleClick(tab, event) {
+      console.log('tabs', tab.label, event);
+      if(tab.label === '关系图谱'){
+        this.setGraphData()
+      }
+    },
+
+    // 图谱
+    onNodeClick(nodeObject, $event) {
+      console.log('onNodeClick:', nodeObject.text)
+    },
+    onLineClick(lineObject, $event) {
+      console.log('onLineClick:', lineObject)
+    },
+    setGraphData(videoId) {
+      axios({
+        method: 'post',
+        url: process.env.VUE_APP_severURL + '/getPeopleRelation',
+        contentType: 'application/x-www-form-urlencoded',
+      }).then(resp => {
+        if (resp.data.code === 20000){
+          // console.log('resp.data.data', resp.data.data)
+          var __graph_json_data = resp.data.data
+          this.$refs.seeksRelationGraph.setJsonData(__graph_json_data, (seeksRGGraph) => {
+            // Called when the relation-graph is completed
+          })
+          this.$message({
+            message: '图谱加载成功！',
+            type: 'success'
+          })
+        }
+      })
+    },
+
+
     share_video: function() {
       this.$copyText(location.href)
       this.$alert('已复制链接到粘贴板！', '视频分享', {
         confirmButtonText: '确定',
       });
-    },
-    get_time: function(s) {
-      return formatSeconds(s)
     },
     add_likes: function() {
       this.like_color = 'FF3E3E'
@@ -436,8 +460,6 @@ export default {
         headers: config.headers
       })
         .then(resp => {
-          // var voice = JSON.stringify(resp.data.subTitle)
-
           var voice = JSON.stringify(resp.data.data)
           var sub_obj = JSON.parse(voice)
 
@@ -847,3 +869,19 @@ ul li {
   text-align: center;
 }
 </style>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style>
+.c-my-node{
+  background-position: center center;
+  background-size: 100%;
+  border:#ff8c00 solid 2px;
+  height:80px;
+  width:80px;
+  border-radius: 40px;
+}
+.c-node-name{
+  width:160px;margin-left:-40px;text-align:center;margin-top:85px;
+}
+</style>
+
