@@ -433,6 +433,12 @@ export const asyncRoutes = [
         meta: { title: '来源国家管理', icon: 'edit' }
       },
       {
+        path: 'people_relation_manage',
+        component: () => import('@/views/admin_functions/people_relation_manage'),
+        name: 'test',
+        meta: { title: '人物关系管理', icon: 'edit' }
+      },
+      {
         path: 'test',
         component: () => import('@/views/admin_functions/test'),
         name: 'test',
