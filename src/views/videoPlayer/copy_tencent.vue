@@ -9,7 +9,7 @@
       </el-table>
 
     </el-dialog>
-    <div id="player_all" style="text-align:center; width: 88%; margin-left: 100px;">
+    <div id="player_all" style="text-align:center; width: 90%; margin-left: 50px;">
       <div style="width: 55%;display: inline-block;vertical-align:top; margin-top: 0px;background-color: #ffffff">
 
         <div id="player" style="width: 100%;float: left">
@@ -33,7 +33,8 @@
           <el-button size="small" type="primary" icon="el-icon-share" circle @click="share_video"></el-button>
         </div>
 
-
+      </div>
+      <div style="width: 40%;display: inline-block;vertical-align:top; margin-top: 2%; margin-left: 3%;background-color: #ffffff">
         <div id="videoTags" style="width: 100%; margin-top: 22px;">
           <el-row style="margin-top: 20px;">
             <el-col :span="4">
@@ -89,9 +90,10 @@
           </div>
         </div>
       </div>
-      <div style="width: 40%; display: inline-block;vertical-align:top; margin-left: 4%;margin-top: 0px;">
-        <el-tabs id="videoTabs" style="width: 100%" @tab-click="handleClick">
-          <el-tab-pane style="text-align: left" label="视频信息">
+
+      <div style="width: 100%; display: block;vertical-align:top; margin-left: 4%;margin-top: 5px;">
+        <el-tabs stretch="true" id="videoTabs" style="width: 100%" @tab-click="handleClick">
+          <el-tab-pane style="text-align: left; font-size: larger" label="视频信息">
             <h4 style="display: inline">视频标题：</h4>{{video_title}}
             <p><h4 style="display: inline">视频来源：</h4>{{addition_data.source_name}}
             <p><h4 style="display: inline">来源简介：</h4>{{addition_data.source_intro}}
@@ -140,7 +142,7 @@
 
           </el-tab-pane>
 
-          <el-tab-pane label="文本识别">
+          <el-tab-pane label="文本识别" style="width: 80%; margin-left: 10%">
             <div ref="wenben" style="max-height: 688px; overflow: auto">
               <div style="width: 100%; height: auto; border-bottom: 2px solid" v-for="(item, index) in textarea"
                    :key="index"
@@ -223,47 +225,54 @@
           </el-tab-pane>
 
           <el-tab-pane label="语音识别">
-            <el-button style="margin-left: 0px;" type="primary" v-on:click="exportRaw('template.txt',textarea1)">导出TXT文本</el-button>
-            <div id="word" style="width: 100%; padding-top: 20px; float: right; height: 100%" ref="zimu">
-              <el-input
-                type="textarea"
-                :rows="20"
-                placeholder="此视频无语音识别结果！"
-                v-model="textarea1"
-                class="textarea"
-                disabled
-              >
-              </el-input>
+            <div style="width: 80%; margin-left: 10%">
+              <el-button style="margin-left: 0px;" type="primary" v-on:click="exportRaw('template.txt',textarea1)">导出TXT文本</el-button>
+              <div id="word" style="width: 100%; padding-top: 20px; float: right; height: 100%" ref="zimu">
+                <el-input
+                  type="textarea"
+                  :rows="20"
+                  placeholder="此视频无语音识别结果！"
+                  v-model="textarea1"
+                  class="textarea"
+                  disabled
+                >
+                </el-input>
+              </div>
             </div>
           </el-tab-pane>
 
           <el-tab-pane label="研讨场景PPT检测">
-            <el-button style="margin-bottom: 10px;" type="primary" @click="get_ppt_pdf_path">点击下载PDF文件</el-button>
+            <div style="width: 36%; margin-left: 32%">
+              <el-button style="margin-bottom: 10px;" type="primary" @click="get_ppt_pdf_path">点击下载PDF文件</el-button>
               <div style=" height: 700px; max-height: 620px;overflow:auto;">
                 <div style="width: 500px; display: inline-block; float: left;"
                      v-for="(item, index) in ppt_imgs" :key="index">
                   <el-image fit="fill" :src="item" ></el-image>
                 </div>
               </div>
+            </div>
           </el-tab-pane>
 
           <el-tab-pane label="声纹检测">
-            <el-button style="margin-left: 0px;" type="primary" v-on:click="exportRaw('template.txt',shengwen_text)">导出TXT文本</el-button>
-            <div id="shengwen" style="width: 100%; padding-top: 20px; float: right; height: 100%" ref="shengw">
-              <el-input
-                type="textarea"
-                :rows="20"
-                placeholder="此视频无声纹识别结果！"
-                v-model="shengwen_text"
-                class="textarea"
-                disabled
-              >
-              </el-input>
+            <div style="width:80%; margin-left:10%">
+              <el-button style="margin-left: 0px;" type="primary" v-on:click="exportRaw('template.txt',shengwen_text)">导出TXT文本</el-button>
+              <div id="shengwen" style="width: 100%; padding-top: 20px; float: right; height: 100%" ref="shengw">
+                <el-input
+                  type="textarea"
+                  :rows="20"
+                  placeholder="此视频无声纹识别结果！"
+                  v-model="shengwen_text"
+                  class="textarea"
+                  disabled
+                >
+                </el-input>
+              </div>
             </div>
           </el-tab-pane>
 
         </el-tabs>
       </div>
+
     </div>
     <br style="clear: both;">
   </div>
@@ -459,6 +468,7 @@ export default {
         headers: config.headers
       }).then(resp => {
         if (resp.data.code === 20000){
+          this.shengwen_text = ''
           var voice = JSON.stringify(resp.data.data)
           var sub_obj = JSON.parse(voice)
           for (var i = 0; i < sub_obj.length; i++) {
@@ -611,7 +621,15 @@ export default {
       }).then(resp => {
 
         if (resp.data.code === 20000){
-          //face
+          //face 清空
+          this.people_name = ''
+          this.people_introduce = ''
+          this.head_img = ''
+          this.faces = []
+          this.people_data = []
+          this.tableData = []
+
+          // 添加数据
           var face_data = resp.data.face_data
           var people_temp = {}
           for (const people in face_data) {
@@ -733,6 +751,7 @@ export default {
         headers: config.headers
       }).then(resp => {
         if (resp.data.code === 20000){
+          this.textarea1 = ''
           var subTitle = JSON.stringify(resp.data.subTitle)
           var sub_obj = JSON.parse(subTitle)
           for (var i = 0; i < sub_obj.length; i++) {
@@ -910,4 +929,14 @@ ul li {
   width:160px;margin-left:-40px;text-align:center;margin-top:85px;
 }
 </style>
+
+
+<!--改变tabs中label的大小-->
+<style scoped>
+/deep/ .el-tabs__item {
+    font-size: 18px;
+}
+</style>
+
+
 
