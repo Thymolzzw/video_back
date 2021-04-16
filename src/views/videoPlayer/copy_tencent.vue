@@ -87,7 +87,6 @@
             </div>
             <el-button style="width: 100%; margin-top: 20px" type="primary" @click="export_product()">导出产品</el-button>
           </div>
-
         </div>
       </div>
       <div style="width: 40%; display: inline-block;vertical-align:top; margin-left: 4%;margin-top: 0px;">
@@ -140,7 +139,6 @@
 
 
           </el-tab-pane>
-
 
           <el-tab-pane label="文本识别">
             <div ref="wenben" style="max-height: 688px; overflow: auto">
@@ -383,13 +381,7 @@ export default {
     }
     this.dialogInfoVisible = true
     this.get_video_data()
-    this.get_subtitle()
     this.get_addition_data()
-    this.get_ppt_imgs()
-    this.get_detect_text()
-    this.get_faces()
-    this.get_voice()
-    this.get_equipment_data()
 
   },
   methods: {
@@ -397,6 +389,18 @@ export default {
       console.log('tabs', tab.label, event);
       if(tab.label === '关系图谱'){
         this.setGraphData()
+      }else if(tab.label === "目标检测"){
+        this.get_equipment_data()
+      }else if(tab.label === "文本识别"){
+        this.get_detect_text()
+      }else if(tab.label === "人脸检测"){
+        this.get_faces()
+      }else if(tab.label === "语音识别"){
+        this.get_subtitle()
+      }else if(tab.label === "研讨场景PPT检测"){
+        this.get_ppt_imgs()
+      }else if(tab.label === "声纹检测"){
+        this.get_voice()
       }
     },
 
@@ -453,11 +457,10 @@ export default {
         contentType: 'application/x-www-form-urlencoded',
         params: param,
         headers: config.headers
-      })
-        .then(resp => {
+      }).then(resp => {
+        if (resp.data.code === 20000){
           var voice = JSON.stringify(resp.data.data)
           var sub_obj = JSON.parse(voice)
-
           for (var i = 0; i < sub_obj.length; i++) {
             this.shengwen_text += sub_obj[i].time
             this.shengwen_text += ' \n'
@@ -467,9 +470,12 @@ export default {
             this.shengwen_text += ' \n'
             this.shengwen_text += ' \n'
           }
-
-
-        })
+          this.$message({
+            message: '声纹数据加载成功！',
+            type: 'success'
+          })
+        }
+      })
     },
     export_product: function() {
       let param = new FormData();
@@ -580,10 +586,15 @@ export default {
         contentType: 'application/x-www-form-urlencoded',
         params: param,
         headers: config.headers
-      })
-        .then(resp => {
+      }).then(resp => {
+        if (resp.data.code === 20000){
           this.textarea = resp.data.text_data
-        })
+          this.$message({
+            message: '检测文本加载成功！',
+            type: 'success'
+          })
+        }
+      })
     },
     get_faces: function() {
       let param = new URLSearchParams()
@@ -597,8 +608,9 @@ export default {
         contentType: 'application/x-www-form-urlencoded',
         params: param,
         headers: config.headers
-      })
-        .then(resp => {
+      }).then(resp => {
+
+        if (resp.data.code === 20000){
           //face
           var face_data = resp.data.face_data
           var people_temp = {}
@@ -629,7 +641,12 @@ export default {
               this.tableData = people_temp.tableData
             }
           }
-        })
+          this.$message({
+            message: '人脸检测加载成功！',
+            type: 'success'
+          })
+        }
+      })
     },
     get_ppt_imgs: function() {
       let param = new URLSearchParams()
@@ -643,10 +660,15 @@ export default {
         contentType: 'application/x-www-form-urlencoded',
         params: param,
         headers: config.headers
-      })
-        .then(resp => {
+      }).then(resp => {
+        if (resp.data.code === 20000){
           this.ppt_imgs = resp.data.ppt_json
-        })
+          this.$message({
+            message: 'PPT加载成功！',
+            type: 'success'
+          })
+        }
+      })
     },
     get_equipment_data: function() {
       this.mubuai_loading = true
@@ -661,12 +683,17 @@ export default {
         contentType: 'application/x-www-form-urlencoded',
         params: param,
         headers: config.headers
-      })
-        .then(resp => {
+      }).then(resp => {
+        if (resp.data.code === 20000){
           // 获取目标检测
           this.equipment_json_data = resp.data.equipment_json_data
           this.mubuai_loading = false
-        })
+          this.$message({
+            message: '目标检测加载成功！',
+            type: 'success'
+          })
+        }
+      })
     },
     get_addition_data: function() {
       let param = new URLSearchParams()
@@ -704,17 +731,21 @@ export default {
         contentType: 'application/x-www-form-urlencoded',
         params: param,
         headers: config.headers
-      })
-        .then(resp => {
+      }).then(resp => {
+        if (resp.data.code === 20000){
           var subTitle = JSON.stringify(resp.data.subTitle)
           var sub_obj = JSON.parse(subTitle)
-
           for (var i = 0; i < sub_obj.length; i++) {
             this.textarea1 += sub_obj[i].time
             this.textarea1 += sub_obj[i].content
             this.textarea1 += ' \n'
           }
-        })
+          this.$message({
+            message: '语音识别加载成功！',
+            type: 'success'
+          })
+        }
+      })
     },
     get_shengwen: function() {
       alert(this.value1)
