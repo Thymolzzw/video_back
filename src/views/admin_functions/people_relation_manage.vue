@@ -1,21 +1,21 @@
 <template>
   <div id="resource_manage">
     <div>
-      <el-button style="margin: 10px;margin-left: 40%" type="primary" icon="el-icon-plus" @click="clickAddResource()">添加新人物关系</el-button>
-      <el-table :data="people_relation_list"  border style="width: 100%; margin-left: 10px;">
+      <el-button style="margin-top: 20px;margin-left: 40%" type="primary" icon="el-icon-plus" @click="clickAddPeopleRelation()">添加新人物关系</el-button>
+      <el-table :data="people_relation_list"  border style="width: 100%; margin-top: 10px; margin-left: 15px;">
         <el-table-column type="index" label="编号" :index="indexMethod" width="80">
         </el-table-column>
-        <el-table-column prop="from_field" label="视频源名称" width="180">
+        <el-table-column prop="from_people_name" label="关系开始节点" width="180">
         </el-table-column>
-        <el-table-column prop="to" label="视频源介绍">
+        <el-table-column prop="to_people_name" label="关系结束节点">
         </el-table-column>
-        <el-table-column prop="text" label="视频源链接">
+        <el-table-column prop="text" label="关系名称">
         </el-table-column>
 
         <el-table-column prop="address" label="操作">
           <template slot-scope="scope">
-            <el-button type="primary" @click="update_resource(scope.$index)">编辑修改</el-button>
-            <el-button type="danger" @click="delete_resource(scope.$index)">删除</el-button>
+            <el-button type="primary" @click="update_people_relation(scope.$index)">编辑修改</el-button>
+            <el-button type="danger" @click="delete_people_relation(scope.$index)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -25,20 +25,50 @@
     <!--新增/编辑界面-->
     <el-dialog :title="titleMap[dialogStatus]" :visible.sync="FormVisible" :close-on-click-modal="false" class="edit-form"
                :before-close="handleClose">
-      <el-form :model="Form" label-width="80px" :rules="editFormRules" ref="Form">
-        <el-form-item label="视频源名称" prop="from_field">
-          <el-input v-model="Form.from_field" auto-complete="off"></el-input>
+      <el-form :model="Form" label-width="15vh" :rules="editFormRules" ref="Form">
+        <el-form-item label="关系开始节点名称" prop="from_field">
+          <el-select filterable v-model="Form.from_field" placeholder="请选择">
+            <el-option
+              v-for="(item, index) in people_list"
+              :key="index"
+              :label="item.people_name"
+              :value="item.people_id">
+              <span style="float: left;width: 70px">
+                 <el-image
+                   style="float: left; height: 32px"
+                   :src="item.people_img"
+                   fit="contain">
+                 </el-image>
+              </span>
+              <span style="float: right; color: #5f6774; font-size: 13px">{{ item.people_name }}</span>
+            </el-option>
+          </el-select>
         </el-form-item>
-        <el-form-item label="视频源介绍" prop="to">
-          <el-input type="textarea" v-model="Form.to"></el-input>
+        <el-form-item label="关系结束节点名称" prop="to">
+          <el-select filterable v-model="Form.to" placeholder="请选择">
+            <el-option
+              v-for="(item, index) in people_list"
+              :key="index"
+              :label="item.people_name"
+              :value="item.people_id">
+              <span style="float: left;width: 70px">
+                 <el-image
+                   style="float: left; height: 32px"
+                   :src="item.people_img"
+                   fit="contain">
+                 </el-image>
+              </span>
+              <span style="float: right; color: #5f6774; font-size: 13px">{{ item.people_name }}</span>
+            </el-option>
+          </el-select>
         </el-form-item>
-        <el-form-item label="视频源链接" prop="text">
+        <el-form-item label="关系名称" prop="text">
           <el-input v-model="Form.text"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="handleClose()">取消</el-button>
-        <el-button type="primary" @click="doAddEditResource()">确定</el-button>
+        <el-button type="primary" @click="doAddEdit()">确定</el-button>
       </div>
     </el-dialog>
 
@@ -87,8 +117,7 @@ export default {
   },
   name: 'people_relation_manage',
   methods: {
-    doAddEditResource(){
-
+    doAddEdit(){
       let param = new FormData()
       param.append('id', this.Form.id)
       param.append('from_field', this.Form.from_field)
@@ -97,7 +126,7 @@ export default {
       param.append('dialog_status', this.dialogStatus)
       axios({
         method: 'post',
-        url: process.env.VUE_APP_severURL + '/addEditResource',
+        url: process.env.VUE_APP_severURL + '/addEditPeopleRelation',
         contentType: 'application/x-www-form-urlencoded',
         data: param,
 
@@ -116,7 +145,7 @@ export default {
       })
 
     },
-    update_resource(index) {
+    update_people_relation(index) {
       this.dialogStatus = 'edit';
       this.Form.id = this.people_relation_list[index].id;
       this.Form.from_field = this.people_relation_list[index].from_field;
@@ -124,7 +153,7 @@ export default {
       this.Form.text = this.people_relation_list[index].text;
       this.FormVisible = true;
     },
-    clickAddResource: function (){
+    clickAddPeopleRelation: function (){
       this.dialogStatus = 'add';
       this.FormVisible = true;
     },
@@ -169,9 +198,9 @@ export default {
       return index + 1;
     },
 
-    delete_resource(delete_index) {
+    delete_people_relation(delete_index) {
       // alert(delete_index)
-      this.$confirm('此操作将删除该资源, 是否继续?', '提示', {
+      this.$confirm('此操作将删除该关系, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -208,5 +237,6 @@ export default {
 </script>
 
 <style scoped>
+
 
 </style>
