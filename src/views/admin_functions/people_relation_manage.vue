@@ -1,15 +1,15 @@
 <template>
   <div id="resource_manage">
     <div>
-      <el-button style="margin: 10px;margin-left: 40%" type="primary" icon="el-icon-plus" @click="clickAddResource()">添加新视频源</el-button>
-      <el-table :data="resource_list"  border style="width: 100%">
+      <el-button style="margin: 10px;margin-left: 40%" type="primary" icon="el-icon-plus" @click="clickAddResource()">添加新人物关系</el-button>
+      <el-table :data="people_relation_list"  border style="width: 100%; margin-left: 10px;">
         <el-table-column type="index" label="编号" :index="indexMethod" width="80">
         </el-table-column>
-        <el-table-column prop="resource_name" label="视频源名称" width="180">
+        <el-table-column prop="from_field" label="视频源名称" width="180">
         </el-table-column>
-        <el-table-column prop="resource_introduce" label="视频源介绍">
+        <el-table-column prop="to" label="视频源介绍">
         </el-table-column>
-        <el-table-column prop="resource_url" label="视频源链接">
+        <el-table-column prop="text" label="视频源链接">
         </el-table-column>
 
         <el-table-column prop="address" label="操作">
@@ -26,14 +26,14 @@
     <el-dialog :title="titleMap[dialogStatus]" :visible.sync="FormVisible" :close-on-click-modal="false" class="edit-form"
                :before-close="handleClose">
       <el-form :model="Form" label-width="80px" :rules="editFormRules" ref="Form">
-        <el-form-item label="视频源名称" prop="resource_name">
-          <el-input v-model="Form.resource_name" auto-complete="off"></el-input>
+        <el-form-item label="视频源名称" prop="from_field">
+          <el-input v-model="Form.from_field" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="视频源介绍" prop="resource_introduce">
-          <el-input type="textarea" v-model="Form.resource_introduce"></el-input>
+        <el-form-item label="视频源介绍" prop="to">
+          <el-input type="textarea" v-model="Form.to"></el-input>
         </el-form-item>
-        <el-form-item label="视频源链接" prop="resource_url">
-          <el-input v-model="Form.resource_url"></el-input>
+        <el-form-item label="视频源链接" prop="text">
+          <el-input v-model="Form.text"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -53,12 +53,13 @@ import axios from 'axios'
 export default {
   data(){
     return{
-      resource_list:[],
+      people_relation_list:[],
+      people_list: [],
       Form: {
-        resource_id: '',
-        resource_name: '',
-        resource_introduce: '',
-        resource_url: ''
+        id: '',
+        from_field: '',
+        to: '',
+        text: ''
       },
       titleMap: {
         add:'新增',
@@ -67,13 +68,13 @@ export default {
       dialogStatus: 'add',
       FormVisible: false,
       editFormRules:{
-        resource_name: [
+        from_field: [
           { required: true, message: '请输入视频源名称', trigger: 'blur' }
         ],
-        resource_introduce: [
+        to: [
           { required: false, message: '请输视频源介绍', trigger: 'blur' }
         ],
-        resource_url: [
+        text: [
           { required: false, message: '请输入视频源链接', trigger: 'blur' }
         ],
       },
@@ -81,18 +82,18 @@ export default {
     }
   },
   mounted() {
-    this.getResourceList()
-
+    this.getPeopleRelationList()
+    this.getPeopleList()
   },
   name: 'people_relation_manage',
   methods: {
     doAddEditResource(){
 
       let param = new FormData()
-      param.append('resource_id', this.Form.resource_id)
-      param.append('resource_name', this.Form.resource_name)
-      param.append('resource_introduce', this.Form.resource_introduce)
-      param.append('resource_url', this.Form.resource_url)
+      param.append('id', this.Form.id)
+      param.append('from_field', this.Form.from_field)
+      param.append('to', this.Form.to)
+      param.append('text', this.Form.text)
       param.append('dialog_status', this.dialogStatus)
       axios({
         method: 'post',
@@ -102,7 +103,7 @@ export default {
 
       }).then(resp => {
         if(resp.data.code === 20000){
-          this.getResourceList();
+          this.getPeopleRelationList();
           this.$alert('操作成功', '操作结果', {
             confirmButtonText: '确定',
           });
@@ -117,10 +118,10 @@ export default {
     },
     update_resource(index) {
       this.dialogStatus = 'edit';
-      this.Form.resource_id = this.resource_list[index].resource_id;
-      this.Form.resource_name = this.resource_list[index].resource_name;
-      this.Form.resource_introduce = this.resource_list[index].resource_introduce;
-      this.Form.resource_url = this.resource_list[index].resource_url;
+      this.Form.id = this.people_relation_list[index].id;
+      this.Form.from_field = this.people_relation_list[index].from_field;
+      this.Form.to = this.people_relation_list[index].to;
+      this.Form.text = this.people_relation_list[index].text;
       this.FormVisible = true;
     },
     clickAddResource: function (){
@@ -129,23 +130,38 @@ export default {
     },
     handleClose: function () {
       this.FormVisible = false;
-      this.Form.resource_id = '';
-      this.Form.resource_name = '';
-      this.Form.resource_introduce = '';
-      this.Form.resource_url = '';
+      this.Form.id = '';
+      this.Form.from_field = '';
+      this.Form.to = '';
+      this.Form.text = '';
     },
-    getResourceList:function(){
-      this.resource_list = []
+    getPeopleRelationList:function(){
+      this.people_relation_list = []
       let config = {
         headers: { 'Accept-Ranges': 'bytes' }
       }
       axios({
         method: 'get',
-        url: process.env.VUE_APP_severURL + '/getResourceList',
+        url: process.env.VUE_APP_severURL + '/getPeopleRelationList',
         contentType: 'application/x-www-form-urlencoded',
         headers: config.headers
       }).then(resp => {
-        this.resource_list = resp.data.data
+        this.people_relation_list = resp.data.data
+      })
+
+    },
+    getPeopleList:function(){
+      this.people_list = []
+      let config = {
+        headers: { 'Accept-Ranges': 'bytes' }
+      }
+      axios({
+        method: 'get',
+        url: process.env.VUE_APP_severURL + '/getPeopleList',
+        contentType: 'application/x-www-form-urlencoded',
+        headers: config.headers
+      }).then(resp => {
+        this.people_list = resp.data.data
       })
 
     },
@@ -162,15 +178,15 @@ export default {
       }).then(() => {
 
         let param = new FormData()
-        param.append('delete_resource_id', this.resource_list[delete_index].resource_id)
+        param.append('delete_id', this.people_relation_list[delete_index].id)
         axios({
           method: 'post',
-          url: process.env.VUE_APP_severURL + '/deleteResource',
+          url: process.env.VUE_APP_severURL + '/deletePeopleRealtion',
           contentType: 'application/x-www-form-urlencoded',
           data: param,
         }).then(resp => {
           if(resp.data.code === 20000){
-            this.resource_list.splice(delete_index,1)
+            this.people_relation_list.splice(delete_index,1)
           }
         });
 

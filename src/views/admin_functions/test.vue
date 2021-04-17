@@ -19,7 +19,7 @@ export default {
       demoname: '---',
       graphOptions: {
         defaultNodeBorderWidth: 0,
-        defaultNodeColor: 'rgba(238, 178, 94, 1)',
+        defaultNodeColor: '#79794f',
         allowSwitchLineShape: true,
         allowSwitchJunctionPoint: true,
         defaultLineShape: 1,

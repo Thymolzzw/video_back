@@ -447,10 +447,6 @@ export const asyncRoutes = [
     ]
   },
 
-  // meta: {
-//           title: 'Page Permission',
-//           roles: ['admin'] // or you can only set roles in sub nav
-//         }
 
   {
     path: '/manage',

@@ -240,7 +240,7 @@
 
           <el-tab-pane label="关系图谱">
             <div>
-              <div style="margin-top:50px;width: calc(100% - 10px);height:calc(100vh - 140px);">
+              <div style="margin-top:5px;width: calc(100% - 10px);height:calc(100vh - 340px);">
                 <SeeksRelationGraph ref="seeksRelationGraph" :options="graphOptions" :on-node-click="onNodeClick"
                                     :on-line-click="onLineClick"/>
               </div>
@@ -422,6 +422,10 @@ export default {
       console.log('tabs', tab.label, event);
       if(tab.label === '关系图谱'){
         this.setGraphData()
+        this.$message({
+          message: '点击图中节点与线条可查看详细信息！',
+          type: 'success'
+        })
       }else if(tab.label === "目标检测"){
         this.get_equipment_data()
       }else if(tab.label === "文本识别"){
