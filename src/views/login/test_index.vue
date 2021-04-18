@@ -61,6 +61,7 @@
 
 <script>
 import { validUsername } from '@/utils/validate'
+import axios from "axios";
 
 export default {
   name: 'Login',
@@ -68,14 +69,14 @@ export default {
   data() {
     const validateUsername = (rule, value, callback) => {
       if (!validUsername(value)) {
-        callback(new Error('请检查您的用户名'))
+        callback(new Error('用户名应大于2位，请检查您的用户名。'))
       } else {
         callback()
       }
     }
     const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error('密码长度不能小于6位！'))
+      if (value.length < 3) {
+        callback(new Error('密码长度不能小于3位！'))
       } else {
         callback()
       }
@@ -140,15 +141,41 @@ export default {
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
-          this.loading = true
-          this.$store.dispatch('user/login', this.loginForm)
-            .then(() => {
-              this.$router.push({ path: this.redirect || '/main' })
-              this.loading = false
-            })
-            .catch(() => {
-              this.loading = false
-            })
+
+          let param = new FormData()
+          param.append('account_name', this.loginForm.username)
+          param.append('password', this.loginForm.password)
+          axios({
+            method: 'post',
+            url: process.env.VUE_APP_severURL + '/doLogin',
+            contentType: 'application/x-www-form-urlencoded',
+            data: param,
+          }).then(resp => {
+            if(resp.data.code === 20000){
+              // 成功登陆
+              // this.$store.state
+
+              // this.my_store.state.id = resp.data.data.id
+              // this.my_store.state.password = resp.data.data.password
+              // this.my_store.state.type = resp.data.data.type
+              // alert(my_store.state.name)
+              console.log(this.$store)
+
+              // this.loading = true
+              // this.$store.dispatch('user/login', this.loginForm)
+              //   .then(() => {
+              //     this.$router.push({ path: this.redirect || '/main' })
+              //     this.loading = false
+              //   })
+              //   .catch(() => {
+              //     this.loading = false
+              //   })
+            }else if(resp.data.code === 2000){
+              console.log('用户不存在')
+              return false
+            }
+          })
+
         } else {
           console.log('错误的提交')
           return false

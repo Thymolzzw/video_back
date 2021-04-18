@@ -348,6 +348,7 @@ export const asyncRoutes = [
 //       }
 //     ]
 //   },
+
   {
     path: '/admin_functions',
     component: Layout,
@@ -509,6 +510,8 @@ export const asyncRoutes = [
       }
     ]
   },
+
+
 //   {
 //     path: '/pdf/download',
 //     component: () => import('@/views/pdf/download'),
@@ -553,6 +556,7 @@ export const asyncRoutes = [
 //   },
 //
   // 404 page must be placed at the end !!!
+
   { path: '*', redirect: '/404', hidden: true }
 ]
 
