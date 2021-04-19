@@ -1,15 +1,15 @@
 <template>
   <div>
-    <div style="margin-top:50px;width: calc(100% - 10px);height:calc(100vh - 140px);">
-      <SeeksRelationGraph ref="seeksRelationGraph" :options="graphOptions" :on-node-click="onNodeClick"
-                          :on-line-click="onLineClick"/>
-    </div>
+
   </div>
 </template>
 
 <script>
 import SeeksRelationGraph from 'relation-graph'
 import axios from 'axios'
+import { state } from '@/store/modules/user'
+import store from "@/store";
+
 export default {
   name: 'SeeksRelationGraphDemo',
   components: { SeeksRelationGraph },
@@ -39,7 +39,10 @@ export default {
   },
   mounted() {
     this.demoname = this.$route.params.demoname
-    this.setGraphData()
+    // this.setGraphData()
+
+    console.log('ok1', store.state.user.user_info.id)
+
   },
   methods: {
     onNodeClick(nodeObject, $event) {

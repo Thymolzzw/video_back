@@ -1,12 +1,12 @@
 import { login, logout, getInfo } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
+import axios from "axios";
 
 const state = {
   token: getToken(),
   name: '',
-  avatar: '',
-  introduction: '',
+  user_info: '',
   roles: []
 }
 
@@ -20,8 +20,8 @@ const mutations = {
   SET_NAME: (state, name) => {
     state.name = name
   },
-  SET_AVATAR: (state, avatar) => {
-    state.avatar = avatar
+  SET_USER_INFO: (state, user_info) => {
+    state.user_info = user_info
   },
   SET_ROLES: (state, roles) => {
     state.roles = roles
@@ -32,15 +32,14 @@ const actions = {
   // user login
   login({ commit }, userInfo) {
     const { username, password } = userInfo
+    // alert(username + password)
     return new Promise((resolve, reject) => {
-      let login_data = new FormData()
-      login_data.append("username", username.trim())
-      login_data.append("password", password)
       login({ username: username.trim(), password: password }).then(response => {
-        const { data } = response
+
         // commit('SET_TOKEN', data.token) { account_name: username.trim(), password: password }
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
+        // console.log("token", response.token)
+        commit('SET_TOKEN', response.token)
+        setToken(response.token)
         resolve()
       }).catch(error => {
         reject(error)
@@ -50,18 +49,23 @@ const actions = {
 
   // get user info
   getInfo({ commit, state }) {
+    // console.log("jinrugetinfo")
     return new Promise((resolve, reject) => {
       let info_data = new FormData()
       info_data.append("username", state.token)
-      console.log(state.token)
+      // console.log("getinfo")
       getInfo(state.token).then(response => {
-        const { data } = response
 
-        if (!data) {
+        if (response.data == null) {
           reject('获取用户信息失败，请重新登录！')
         }
-        console.log(data)
-        const { roles, name, avatar, introduction } = data
+        console.log("data", response.data)
+        const user_id = response.data.id
+        const user_name = response.data.name
+        const user_account_name = response.data.account_name
+        const user_password = response.data.password
+        const user_type = response.data.type
+        const roles = response.data.roles
 
         // roles must be a non-empty array
         if (!roles || roles.length <= 0) {
@@ -69,10 +73,10 @@ const actions = {
         }
 
         commit('SET_ROLES', roles)
-        commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
-        commit('SET_INTRODUCTION', introduction)
-        resolve(data)
+        commit('SET_NAME', user_account_name)
+        commit('SET_USER_INFO', response.data)
+        // commit('SET_INTRODUCTION', introduction)
+        resolve(response.data)
       }).catch(error => {
         reject(error)
       })

@@ -416,6 +416,7 @@ export default {
     this.get_video_data()
     this.get_addition_data()
 
+
   },
   methods: {
     handleClick(tab, event) {

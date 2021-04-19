@@ -1,21 +1,23 @@
 import request from '@/utils/request'
 
 export function login(data) {
+  // alert(data.username)
+  let login_data = new FormData()
+  login_data.append("username", data.username)
+  login_data.append("password", data.password)
   return request({
-    // url: process.env.VUE_APP_severURL + '/doLogin',
-    url: '/vue-element-admin/user/login',
+    url: process.env.VUE_APP_severURL + '/doLogin',
     method: 'post',
-    // data: data
-    data
+    contentType: 'application/x-www-form-urlencoded',
+    data: login_data
   })
 }
 
 export function getInfo(token) {
+  // console.log("request")
   return request({
-    // url: process.env.VUE_APP_severURL + '/getUserInfo',
-    url: '/vue-element-admin/user/info',
+    url: process.env.VUE_APP_severURL + '/getUserInfo',
     method: 'get',
-    // param: token
     params: { token }
   })
 }

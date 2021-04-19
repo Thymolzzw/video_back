@@ -79,8 +79,10 @@
 
 <script>
 import axios from 'axios'
+import permission from '@/directive/permission/index.js'
 
 export default {
+  directives: { permission },
   data(){
     return{
       people_relation_list:[],

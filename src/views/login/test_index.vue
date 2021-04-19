@@ -154,46 +154,7 @@ export default {
             })
 
 
-          // this.loading = true
-          // let param = new FormData()
-          // param.append('account_name', this.loginForm.username)
-          // param.append('password', this.loginForm.password)
-          // axios({
-          //   method: 'post',
-          //   url: process.env.VUE_APP_severURL + '/doLogin',
-          //   contentType: 'application/x-www-form-urlencoded',
-          //   data: param,
-          // }).then(resp => {
-          //   if(resp.data.code === 20000){
-          //     // 成功登陆
-          //     alert("ok" + resp.data.data.type)
-          //
-          //     this.$store.state.id = resp.data.data.id
-          //     this.$store.state.password = resp.data.data.password
-          //     this.$store.state.type = resp.data.data.type
-          //     this.$store.state.name = resp.data.data.name
-          //     this.$store.state.account_name = resp.data.data.account_name
-          //     console.log(this_this.$store.state.name)
-          //
-          //     this_this.$router.push({ path: '/main' })
-          //     console.log("$router", this.$router)
-          //     this.loading = false
-          //
-          //     // this.loading = true
-          //     // this.$store.dispatch('user/login', this.loginForm)
-          //     //   .then((res) => {
-          //     //     this.$router.push({ path: this.redirect || '/main' })
-          //     //     this.loading = false
-          //     //   })
-          //     //   .catch(() => {
-          //     //     this.loading = false
-          //     //   })
-          //   }else if(resp.data.code === 2000){
-          //     this.loading = false
-          //     console.log('用户不存在')
-          //     return false
-          //   }
-          // })
+
 
         } else {
           console.log('错误的提交')

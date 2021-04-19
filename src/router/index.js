@@ -67,7 +67,7 @@ export const constantRoutes = [
         path: 'hotPoint',
         component: () => import('@/views/hotPoint/index'),
         name: '热点视频',
-        meta: { title: '热点视频', icon: 'guide' }
+        meta: { title: '热点视频', icon: 'guide'}
       }
     ]
   },
@@ -205,14 +205,14 @@ export const asyncRoutes = [
     meta: {
       title: '数据修改',
       icon: 'el-icon-s-help',
-      roles: ['admin', 'editor', 'visitor']
+      roles: ['admin', 'editor']
     },
     children: [
       {
         path: 'videoUpload',
         component: () => import('@/views/videoUpload/fake'),
         name: '视频上传',
-        meta: { title: '视频上传', icon: 'link' }
+        meta: { title: '视频上传', icon: 'link'}
       },
 
       {
@@ -308,42 +308,13 @@ export const asyncRoutes = [
         name: 'users',
         meta: { title: '人员管理', icon: 'edit' }
       },
-      // {
-      //   path: 'messge_origin',
-      //   component: () => import('@/views/manage/messge_origin'),
-      //   name: 'messge_origin',
-      //   meta: { title: '信息源管理', icon: 'edit' }
-      // },
-      // {
-      //   path: 'data_pool',
-      //   component: () => import('@/views/manage/data_pool'),
-      //   name: 'data_pool',
-      //   meta: { title: '数据池管理', icon: 'edit' }
-      // },
       {
         path: 'people',
         component: () => import('@/views/manage/people'),
         name: 'people',
         meta: { title: '人物管理', icon: 'edit' }
       },
-      // {
-      //   path: 'video_data',
-      //   component: () => import('@/views/manage/video_data'),
-      //   name: 'video_data',
-      //   meta: { title: '视频分析结果管理', icon: 'edit' }
-      // },
-      // {
-      //   path: 'products',
-      //   component: () => import('@/views/manage/products'),
-      //   name: 'products',
-      //   meta: { title: '产品管理', icon: 'edit' }
-      // },
-      // {
-      //   path: 'user_log',
-      //   component: () => import('@/views/manage/user_log'),
-      //   name: 'user_log',
-      //   meta: { title: '用户操作记录管理', icon: 'edit' }
-      // },
+
       {
         path: 'power',
         component: () => import('@/views/manage/power'),
