@@ -16,7 +16,7 @@
     </div>
 
     <div>
-      <div style="height: 800px; background-color: #fcfafa">
+      <div style="height: 100%; overflow: scroll; background-color: #fcfafa">
         <div id="people_img_name">
 
           <div style="width: 25%; display: inline-block; height: auto;">

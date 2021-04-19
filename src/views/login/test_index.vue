@@ -146,7 +146,7 @@ export default {
           this.loading = true
           this.$store.dispatch('user/login', this.loginForm)
             .then(() => {
-              this.$router.push({ path: this.redirect || '/main' })
+              this_this.$router.push({ path: this.redirect || '/main' })
               this.loading = false
             })
             .catch(() => {
