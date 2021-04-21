@@ -60,6 +60,20 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/profile',
+    component: Layout,
+    redirect: '/profile/index',
+    hidden: true,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/profile/index'),
+        name: 'Profile',
+        meta: { title: 'Profile', icon: 'user', noCache: true }
+      }
+    ]
+  },
+  {
     path: '/hotPoint',
     component: Layout,
     children: [
@@ -296,6 +310,7 @@ export const asyncRoutes = [
     component: Layout,
     // redirect: '/example/list',
     name: 'manage',
+    alwaysShow: true,
     meta: {
       title: '系统管理',
       icon: 'el-icon-s-help',
@@ -306,28 +321,25 @@ export const asyncRoutes = [
         path: 'users',
         component: () => import('@/views/manage/user_temp'),
         name: 'users',
-        meta: { title: '人员管理', icon: 'edit' }
+        meta: { title: '用户管理', icon: 'edit' }
       },
-      {
-        path: 'people',
-        component: () => import('@/views/manage/people'),
-        name: 'people',
-        meta: { title: '人物管理', icon: 'edit' }
-      },
-
-      {
-        path: 'power',
-        component: () => import('@/views/manage/power'),
-        name: 'power',
-        meta: { title: '权限管理', icon: 'edit' }
-      }
+      // {
+      //   path: 'people',
+      //   component: () => import('@/views/manage/people'),
+      //   name: 'people',
+      //   meta: { title: '人物管理', icon: 'edit' }
+      // },
+      //
+      // {
+      //   path: 'power',
+      //   component: () => import('@/views/manage/power'),
+      //   name: 'power',
+      //   meta: { title: '权限管理', icon: 'edit' }
+      // }
     ]
   },
 
-
-
   // 404 page must be placed at the end !!!
-
   { path: '*', redirect: '/404', hidden: true }
 ]
 

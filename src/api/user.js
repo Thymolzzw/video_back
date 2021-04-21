@@ -13,6 +13,20 @@ export function login(data) {
   })
 }
 
+export function register(data) {
+  // alert(data.username)
+  let login_data = new FormData()
+  login_data.append("register_account_name", data.register_account_name)
+  login_data.append("register_password", data.register_password)
+  login_data.append("register_email", data.register_email)
+  return request({
+    url: process.env.VUE_APP_severURL + '/doSignUp',
+    method: 'post',
+    contentType: 'application/x-www-form-urlencoded',
+    data: login_data
+  })
+}
+
 export function getInfo(token) {
   // console.log("request")
   return request({

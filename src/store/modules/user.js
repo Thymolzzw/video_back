@@ -1,4 +1,4 @@
-import { login, logout, getInfo } from '@/api/user'
+import { login, logout, getInfo, register } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
 import axios from "axios";
@@ -6,11 +6,16 @@ import axios from "axios";
 const state = {
   token: getToken(),
   name: '',
+  avatar: '',
+  introduction: '',
   user_info: '',
   roles: []
 }
 
 const mutations = {
+  SET_AVATAR: (state, avatar) => {
+    state.avatar = avatar
+  },
   SET_TOKEN: (state, token) => {
     state.token = token
   },
@@ -29,6 +34,24 @@ const mutations = {
 }
 
 const actions = {
+  // user register
+  register({ commit }, userInfo) {
+    const { register_account_name, register_password, register_email } = userInfo
+    // alert(username + password)
+    return new Promise((resolve, reject) => {
+      register({ register_account_name: register_account_name.trim(), register_password: register_password,
+        register_email: register_email}).then(response => {
+
+          commit('SET_TOKEN', response.token)
+          setToken(response.token)
+          resolve()
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+
+
   // user login
   login({ commit }, userInfo) {
     const { username, password } = userInfo
@@ -52,7 +75,7 @@ const actions = {
     // console.log("jinrugetinfo")
     return new Promise((resolve, reject) => {
       let info_data = new FormData()
-      info_data.append("username", state.token)
+      info_data.append("user_id", state.token)
       // console.log("getinfo")
       getInfo(state.token).then(response => {
 
@@ -75,6 +98,7 @@ const actions = {
         commit('SET_ROLES', roles)
         commit('SET_NAME', user_account_name)
         commit('SET_USER_INFO', response.data)
+        commit('SET_AVATAR', response.data.avatar)
         // commit('SET_INTRODUCTION', introduction)
         resolve(response.data)
       }).catch(error => {

@@ -1,7 +1,7 @@
 <template>
   <div id="user">
     <el-input style="width: 20%" v-model="search_text"></el-input>
-    <el-button type="primary">搜索</el-button>
+    <el-button type="primary" @click="searchUser()">搜索</el-button>
     <el-button style="margin-left: 15px;" type="primary" @click="addUserVisible = true">添加用户</el-button>
 
     <el-table

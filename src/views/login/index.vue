@@ -1,67 +1,114 @@
 <template>
   <div class="login-container">
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" autocomplete="on" label-position="left">
+    <div class="title-container" style="margin-top: 110px">
+      <h3 class="title">视音频数据智能分析原型系统</h3>
+    </div>
 
-      <div class="title-container">
-        <h3 class="title">Login Form</h3>
-      </div>
+    <el-tabs style="width: 500px; margin-left: calc(50% - 250px); background-color: #2d3a4b; border-color: #2d3a4b; margin-top: 50px" type="border-card" v-model="activeTab" stretch="true">
 
-      <el-form-item prop="username">
-        <span class="svg-container">
-          <svg-icon icon-class="user" />
-        </span>
-        <el-input
-          ref="username"
-          v-model="loginForm.username"
-          placeholder="Username"
-          name="username"
-          type="text"
-          tabindex="1"
-          autocomplete="on"
-        />
-      </el-form-item>
+      <el-tab-pane style="border-color: #2d3a4b" label="登录" name="login">
 
-      <el-tooltip v-model="capsTooltip" content="Caps lock is On" placement="right" manual>
-        <el-form-item prop="password">
-          <span class="svg-container">
-            <svg-icon icon-class="password" />
-          </span>
-          <el-input
-            :key="passwordType"
-            ref="password"
-            v-model="loginForm.password"
-            :type="passwordType"
-            placeholder="Password"
-            name="password"
-            tabindex="2"
-            autocomplete="on"
-            @keyup.native="checkCapslock"
-            @blur="capsTooltip = false"
-            @keyup.enter.native="handleLogin"
-          />
-          <span class="show-pwd" @click="showPwd">
+        <el-form style="background-color: #2d3a4b; margin-top: -110px" ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" autocomplete="on" label-position="left">
+
+          <el-form-item prop="username">
+            <span class="svg-container">
+              <svg-icon icon-class="user"/>
+            </span>
+            <el-input
+              ref="username"
+              v-model="loginForm.username"
+              placeholder="账户名"
+              name="username"
+              type="text"
+              tabindex="1"
+              autocomplete="on"
+            />
+          </el-form-item>
+
+          <el-tooltip v-model="capsTooltip" content="Caps lock is On" placement="right" manual>
+            <el-form-item prop="password">
+              <span class="svg-container">
+                <svg-icon icon-class="password" />
+              </span>
+              <el-input
+                :key="passwordType"
+                ref="password"
+                v-model="loginForm.password"
+                :type="passwordType"
+                placeholder="密码"
+                name="password"
+                tabindex="2"
+                autocomplete="on"
+                @keyup.native="checkCapslock"
+                @blur="capsTooltip = false"
+                @keyup.enter.native="handleLogin"
+              />
+              <span class="show-pwd" @click="showPwd">
             <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
           </span>
-        </el-form-item>
-      </el-tooltip>
+            </el-form-item>
+          </el-tooltip>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
+          <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
 
-      <div style="position:relative">
-        <div class="tips">
-          <span>Username : admin</span>
-          <span>Password : any</span>
-        </div>
-        <div class="tips">
-          <span style="margin-right:18px;">Username : editor</span>
-          <span>Password : any</span>
-        </div>
+        </el-form>
 
-        <el-button class="thirdparty-button" type="primary" @click="showDialog=true">
-          Or connect with
-        </el-button>
-      </div>
-    </el-form>
+      </el-tab-pane>
+
+
+      <el-tab-pane label="注册" name="register">
+
+        <!--        <el-form style="margin-top: -110px" ref="registerForm" :model="registerForm" :rules="registerRules" class="login-form" autocomplete="on" label-position="left">-->
+        <!--          <el-form-item prop="register_account_name">-->
+        <!--            <span class="svg-container">-->
+        <!--              <svg-icon icon-class="user"/>-->
+        <!--            </span>-->
+        <!--            <el-input-->
+        <!--              v-model="registerForm.register_account_name"-->
+        <!--              placeholder="账户名"-->
+        <!--              name="register_account_name"-->
+        <!--              ref="register_account_name"-->
+        <!--              type="text"-->
+        <!--              tabindex="1"-->
+        <!--              autocomplete="on"-->
+        <!--            />-->
+        <!--          </el-form-item>-->
+
+        <!--          <el-form-item prop="register_password">-->
+        <!--            <span class="svg-container">-->
+        <!--              <svg-icon icon-class="password"/>-->
+        <!--            </span>-->
+        <!--            <el-input-->
+        <!--              v-model="registerForm.register_password"-->
+        <!--              placeholder="密码"-->
+        <!--              name="register_password"-->
+        <!--              ref="register_password"-->
+        <!--              type="text"-->
+        <!--              tabindex="2"-->
+        <!--              autocomplete="on"-->
+        <!--            />-->
+        <!--          </el-form-item>-->
+
+        <!--          <el-form-item prop="register_email">-->
+        <!--            <span class="svg-container">-->
+        <!--              <svg-icon icon-class="email"/>-->
+        <!--            </span>-->
+        <!--            <el-input-->
+        <!--              v-model="registerForm.register_email"-->
+        <!--              placeholder="邮箱"-->
+        <!--              name="register_email"-->
+        <!--              ref="register_email"-->
+        <!--              type="text"-->
+        <!--              tabindex="3"-->
+        <!--              autocomplete="on"-->
+        <!--            />-->
+        <!--          </el-form-item>-->
+
+        <!--          <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleRegister">注册</el-button>-->
+
+        <!--        </el-form>-->
+      </el-tab-pane>
+    </el-tabs>
 
     <el-dialog title="Or connect with" :visible.sync="showDialog">
       Can not be simulated on local, so please combine you own business simulation! ! !
@@ -75,34 +122,49 @@
 
 <script>
 import { validUsername } from '@/utils/validate'
-import SocialSign from './components/SocialSignin'
+import axios from "axios";
 
 export default {
   name: 'Login',
-  components: { SocialSign },
+  components: {  },
   data() {
     const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
-      } else {
-        callback()
+      if (value.length <= 2) {
+        callback(new Error('用户名应大于2位，请检查您的用户名。'))
       }
     }
     const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
-      } else {
-        callback()
+      if (value.length < 3) {
+        callback(new Error('密码长度不能小于3位！'))
       }
     }
+    const validateEmail = (rule, value, callback) => {
+      if(value.length !== 0) {
+        if(!this.isEmail(value)){
+          callback(new Error('邮箱格式不正确！'))
+        }
+      }
+    }
+
     return {
+      activeTab: 'login',
       loginForm: {
-        username: 'admin',
-        password: '111111'
+        username: '',
+        password: '',
+      },
+      registerForm: {
+        register_account_name: '',
+        register_password: '',
+        register_email: '',
+      },
+      registerRules:{
+        register_account_name: [{ required: true, trigger: 'blur', validator: validateUsername }],
+        register_password: [{ required: true, trigger: 'blur', validator: validatePassword }],
+        register_email: [{ required: false, trigger: 'blur', validator: validateEmail }]
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        password: [{ required: true, trigger: 'blur', validator: validatePassword }],
       },
       passwordType: 'password',
       capsTooltip: false,
@@ -118,6 +180,7 @@ export default {
         const query = route.query
         if (query) {
           this.redirect = query.redirect
+          // alert("this.redirect" + this.redirect)
           this.otherQuery = this.getOtherQuery(query)
         }
       },
@@ -138,6 +201,9 @@ export default {
     // window.removeEventListener('storage', this.afterQRScan)
   },
   methods: {
+    isEmail(s) {
+      return /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+((.[a-zA-Z0-9_-]{2,3}){1,2})$/.test(s)
+    },
     checkCapslock(e) {
       const { key } = e
       this.capsTooltip = key && key.length === 1 && (key >= 'A' && key <= 'Z')
@@ -152,20 +218,47 @@ export default {
         this.$refs.password.focus()
       })
     },
+
+    // handleRegister(){
+    //   alert("zuce")
+    //   this.$refs.registerForm.validate(valid => {
+    //     if (valid) {
+    //       this.loading = true
+    //       this.$store.dispatch('user/register', this.registerForm)
+    //         .then(() => {
+    //           // alert(this.redirect)
+    //           // this.$router.push({ path: this.redirect || '/' })
+    //           this.$router.push({ path: '/' })
+    //           this.loading = false
+    //         })
+    //         .catch(() => {
+    //           this.loading = false
+    //         })
+    //     } else {
+    //       console.log('错误的提交')
+    //       return false
+    //     }
+    //   })
+    // },
     handleLogin() {
+      // const this_this = this
+      alert("login")
       this.$refs.loginForm.validate(valid => {
+        alert("jinru")
         if (valid) {
           this.loading = true
           this.$store.dispatch('user/login', this.loginForm)
             .then(() => {
-              this.$router.push({ path: this.redirect || '/main' })
+              // alert(this.redirect)
+              // this.$router.push({ path: this.redirect || '/' })
+              this.$router.push({ path: '/' })
               this.loading = false
             })
             .catch(() => {
               this.loading = false
             })
         } else {
-          console.log('error submit!!')
+          console.log('错误的提交')
           return false
         }
       })
@@ -178,24 +271,6 @@ export default {
         return acc
       }, {})
     }
-    // afterQRScan() {
-    //   if (e.key === 'x-admin-oauth-code') {
-    //     const code = getQueryObject(e.newValue)
-    //     const codeMap = {
-    //       wechat: 'code',
-    //       tencent: 'code'
-    //     }
-    //     const type = codeMap[this.auth_type]
-    //     const codeName = code[type]
-    //     if (codeName) {
-    //       this.$store.dispatch('LoginByThirdparty', codeName).then(() => {
-    //         this.$router.push({ path: this.redirect || '/' })
-    //       })
-    //     } else {
-    //       alert('第三方登录失败')
-    //     }
-    //   }
-    // }
   }
 }
 </script>
@@ -320,5 +395,12 @@ $light_gray:#eee;
       display: none;
     }
   }
+}
+</style>
+
+<style scoped>
+/deep/ .el-tabs--border-card > .el-tabs__header{
+  color: #00FF00;
+  background: #2d3a4b;
 }
 </style>
