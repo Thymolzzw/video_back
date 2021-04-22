@@ -29,7 +29,7 @@
         </div>
 
         <div id="likes">
-          <el-button size="small" type="primary" icon="el-icon-thumb" @click="add_likes" circle></el-button>
+          <el-button size="small" type="primary" :icon="like_state" @click="add_likes" circle></el-button>
           <el-button size="small" type="primary" icon="el-icon-share" circle @click="share_video"></el-button>
         </div>
 
@@ -308,6 +308,7 @@ import html2canvas from 'html2canvas'
 import jspdf from 'jspdf'
 import { formatSeconds } from '@/api/time'
 import SeeksRelationGraph from "relation-graph";
+import store from "@/store";
 
 
 export default {
@@ -315,6 +316,8 @@ export default {
   components: { SeeksRelationGraph },
   data() {
     return {
+      like_state: 'el-icon-star-off',
+
       // 图谱
       g_loading: true,
       graphOptions: {
@@ -415,6 +418,7 @@ export default {
     this.dialogInfoVisible = true
     this.get_video_data()
     this.get_addition_data()
+    this.getLikeState()
 
 
   },
@@ -490,9 +494,59 @@ export default {
       });
     },
     add_likes: function() {
-      this.like_color = 'FF3E3E'
-      alert('liked')
+
+      // alert('liked')
+      let param = new URLSearchParams()
+      param.append('videoId', this.video_id)
+      param.append('user_id', store.state.user.user_info.id)
+      let config = {
+        headers: { 'Accept-Ranges': 'bytes' }
+      }
+      axios({
+        method: 'get',
+        url: process.env.VUE_APP_severURL + '/doCollect',
+        contentType: 'application/x-www-form-urlencoded',
+        params: param,
+        // headers: config.headers
+      }).then(resp => {
+        if (resp.data.code === 20000){
+          this.like_state = 'el-icon-star-on'
+          this.$message({
+            message: '收藏成功',
+            type: 'success'
+          })
+        }else{
+          this.like_state = 'el-icon-star-off'
+          this.$message({
+            message: '取消收藏成功',
+            type: 'success'
+          })
+        }
+      })
+
     },
+    getLikeState(){
+      let param = new URLSearchParams()
+      param.append('videoId', this.video_id)
+      param.append('user_id', store.state.user.user_info.id)
+      let config = {
+        headers: { 'Accept-Ranges': 'bytes' }
+      }
+      axios({
+        method: 'get',
+        url: process.env.VUE_APP_severURL + '/getCollect',
+        contentType: 'application/x-www-form-urlencoded',
+        params: param,
+        // headers: config.headers
+      }).then(resp => {
+        if (resp.data.code === 20000){
+          this.like_state = 'el-icon-star-on'
+        }else{
+          this.like_state = 'el-icon-star-off'
+        }
+      })
+    },
+
     get_voice: function() {
       let param = new URLSearchParams()
       param.append('videoId', this.video_id)
