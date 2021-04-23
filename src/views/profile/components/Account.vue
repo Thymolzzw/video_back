@@ -77,6 +77,12 @@ export default {
             type: 'success',
             duration: 3 * 1000
           })
+        }else if(resp.data.code === 3000){
+          this.$message({
+            message: '用户信息修改失败，账户名已经存在！',
+            type: 'danger',
+            duration: 3 * 1000
+          })
         }else{
           this.$message({
             message: '用户信息修改失败！',
