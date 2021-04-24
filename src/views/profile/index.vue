@@ -16,6 +16,9 @@
               <el-tab-pane label="收藏" name="timeline" style="height: 100vh; overflow: scroll">
                 <timeline />
               </el-tab-pane>
+              <el-tab-pane label="操作记录" name="timeline2" style="height: 100vh; overflow: scroll">
+                <timeline2 />
+              </el-tab-pane>
               <el-tab-pane label="账户信息" name="account">
                 <account :user="user" />
               </el-tab-pane>
@@ -33,11 +36,12 @@ import { mapGetters } from 'vuex'
 import UserCard from './components/UserCard'
 import Activity from './components/Activity'
 import Timeline from './components/Timeline'
+import Timeline2 from './components/Timeline2'
 import Account from './components/Account'
 
 export default {
   name: 'Profile',
-  components: { UserCard, Activity, Timeline, Account },
+  components: { UserCard, Activity, Timeline2, Timeline, Account },
   data() {
     return {
       user: {},
