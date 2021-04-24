@@ -93,6 +93,7 @@ export const constantRoutes = [
       title: '视频分类',
       icon: 'el-icon-s-help'
     },
+    hidden: true,
     children: [
       {
         path: 'shizhan',

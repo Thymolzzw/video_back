@@ -35,6 +35,7 @@
 
 <script lang="ts">
 import axios from 'axios'
+import store from "../../store/index";
 
 export default ({
   data(){
@@ -77,17 +78,27 @@ export default ({
         })
     },
     to_play_video: function (event) {
-      // alert(event)
-      this.$router.push({
-        path: '/player',
-        name: '视频播放详情页',
-        // params: {
-        //   video_url: 'event'
-        // },
-        query: {
-          video_id: event
-        }
+      let param = new URLSearchParams()
+      param.append('videoId', event)
+      param.append('user_id', store.state.user.user_info.id)
+      axios({
+        method: 'get',
+        url: process.env.VUE_APP_severURL + '/clickVideo',
+        contentType: 'application/x-www-form-urlencoded',
+        params: param,
+      }).then(resp => {
+          if(resp.data.code === 20000){
+
+            this.$router.push({
+              path: '/player',
+              name: '视频播放详情页',
+              query: {
+                video_id: event
+              }
+            })
+          }
       })
+
     },
     aaa: function (msg) {
       // alert(msg)
