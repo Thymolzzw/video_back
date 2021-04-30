@@ -276,6 +276,7 @@ export default {
       this.sorted_list = this.get_sorted_list()
 
       formdata.append('file', this.file.raw)
+      alert(this.query.title)
       formdata.append('title', this.query.title)
       formdata.append('functions', this.sorted_list)
       formdata.append('source', this.source_value)

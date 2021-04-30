@@ -31,6 +31,7 @@
         <div id="likes">
           <el-button size="small" type="primary" :icon="like_state" @click="add_likes" circle></el-button>
           <el-button size="small" type="primary" icon="el-icon-share" circle @click="share_video"></el-button>
+          <el-button size="small" type="primary" icon="el-icon-s-comment" circle @click="open_comment"></el-button>
         </div>
 
       </div>
@@ -103,6 +104,7 @@
             <p><h4 style="display: inline">分辨率：</h4>{{addition_data.video_frame_width}} x {{addition_data.video_frame_height}}
             <p><h4 style="display: inline">视频比例：</h4>{{addition_data.video_frame_proportion}}
           </el-tab-pane>
+
 
           <el-tab-pane label="目标检测"
                        v-loading="mubuai_loading"
@@ -298,6 +300,24 @@
 
     </div>
     <br style="clear: both;">
+
+    <el-drawer
+      title="评论区"
+      size="45%"
+      :visible.sync="comment_info.drawer"
+      :direction="comment_info.direction"
+      :before-close="drawerHandleClose">
+      <div>
+        <comment style="height: 100vh; overflow: scroll;"
+          :authorId="comment_info.authorId"
+          :avatar="comment_info.my_avatar"
+          :commentList="comment_info.commentList"
+          :commentNum="comment_info.commentNum"
+          @doSend="doSend"
+        ></comment>
+      </div>
+    </el-drawer>
+
   </div>
 </template>
 
@@ -309,11 +329,10 @@ import jspdf from 'jspdf'
 import { formatSeconds } from '@/api/time'
 import SeeksRelationGraph from "relation-graph";
 import store from "@/store";
-
-
+import comment from '../../components/bright-comment/dist/bright.comment'
 export default {
   name: 'SeeksRelationGraphDemo',
-  components: { SeeksRelationGraph },
+  components: { SeeksRelationGraph, comment},
   data() {
     return {
       like_state: 'el-icon-star-off',
@@ -403,14 +422,30 @@ export default {
           remainingTimeDisplay: false,
           fullscreenToggle: true  //全屏按钮
         }
-      }
+      },
+
+      comment_info:{
+        drawer: false,
+        direction: 'rtl',
+        authorId: '',
+        commentNum: '',
+        commentList: [],
+        my_avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
+        content: {
+          id: '',
+          commentUser: '',
+          content: '121',
+          createDate: '2020-04-30'
+        },
+        commentUser: {
+          id: '',
+          nickName: 'qqq',
+          avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif'
+        },
+      },
     }
   },
   mounted() {
-    // 图谱
-    // this.demoname = this.$route.params.demoname
-    // this.setGraphData()
-
     this.video_id = this.$route.query.video_id
     if (this.video_id === undefined) {
       this.video_id = 1
@@ -419,10 +454,86 @@ export default {
     this.get_video_data()
     this.get_addition_data()
     this.getLikeState()
-
+    this.init_comment()
 
   },
   methods: {
+    doSend(content){
+      // alert(content)
+      // console.log('content', content)
+      let param = new FormData()
+      param.append('videoId', this.video_id)
+      param.append('user_id', store.state.user.user_info.id)
+      param.append('comment', content)
+      axios({
+        method: 'post',
+        url: process.env.VUE_APP_severURL + '/addComment',
+        contentType: 'application/x-www-form-urlencoded',
+        data: param,
+      }).then(resp => {
+        if (resp.data.code === 20000){
+
+          var objstring = JSON.stringify(this.comment_info.content)
+          var content_obj = JSON.parse(objstring)
+          content_obj.content = content
+          content_obj.createDate = resp.data.data.createDate
+          content_obj.id = resp.data.data.id
+
+          var objstring2 = JSON.stringify(this.comment_info.commentUser)
+          var user_obj = JSON.parse(objstring2)
+          user_obj.id = store.state.user.user_info.id
+          user_obj.nickName = store.state.user.user_info.account_name
+          user_obj.avatar = store.state.user.user_info.avatar
+          content_obj.commentUser = user_obj
+
+          var newArray = []
+          newArray.push(content_obj)
+          this.comment_info.commentList = newArray.concat(this.comment_info.commentList)
+          this.comment_info.commentNum = this.comment_info.commentList.length
+
+          this.$message({
+            message: '评论成功！',
+            type: 'success'
+          })
+        }
+      })
+    },
+    init_comment(){
+      // 初始化列表
+      let param = new FormData()
+      param.append('videoId', this.video_id)
+      axios({
+        method: 'post',
+        url: process.env.VUE_APP_severURL + '/getCommentList',
+        contentType: 'application/x-www-form-urlencoded',
+        data: param,
+      }).then(resp => {
+        if(resp.data.code === 20000){
+          this.comment_info.commentList = resp.data.data
+
+          this.comment_info.authorId = store.state.user.user_info.id
+          this.comment_info.my_avatar = store.state.user.user_info.avatar
+          this.comment_info.commentNum = this.comment_info.commentList.length
+
+          this.$message({
+            message: '评论加载成功！',
+            type: 'success'
+          })
+        }else{
+          this.$message({
+            message: '评论加载失败！',
+            type: 'info'
+          })
+        }
+      })
+    },
+    open_comment(){
+      this.comment_info.drawer = true
+    },
+    drawerHandleClose(done) {
+      this.comment_info.drawer = false
+    },
+
     handleClick(tab, event) {
       console.log('tabs', tab.label, event);
       if(tab.label === '关系图谱'){

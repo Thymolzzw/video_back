@@ -225,7 +225,7 @@ export const asyncRoutes = [
     children: [
       {
         path: 'videoUpload',
-        component: () => import('@/views/videoUpload/fake'),
+        component: () => import('@/views/videoUpload/index'),
         name: '视频上传',
         meta: { title: '视频上传', icon: 'link'}
       },

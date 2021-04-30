@@ -1,6 +1,7 @@
 <template>
   <div class="block">
-    <el-timeline>
+    <div v-if="has_videos === false">无内容</div>
+    <el-timeline v-if="has_videos === true">
       <el-timeline-item v-for="(item,index) of timeline" :key="index" :timestamp="item.time" placement="top">
         <el-card style="height: auto; width: 300px" :body-style="{ padding: '2px' }" shadow="hover" @click.native="to_play_video(item.video_object[0].pk)">
           <img style="height: auto; width: 100%" :src="item.video_object[0].fields.snapshoot_img" class="image">

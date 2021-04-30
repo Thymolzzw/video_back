@@ -10,13 +10,13 @@
         <el-col :span="18" :xs="24">
           <el-card>
             <el-tabs v-model="activeTab">
-              <el-tab-pane label="活动" name="activity" style="height: 100vh; overflow: scroll">
-                <activity />
+              <el-tab-pane label="评论历史" name="activity" style="height: 100vh; overflow: scroll">
+                <comment-history />
               </el-tab-pane>
-              <el-tab-pane label="收藏" name="timeline" style="height: 100vh; overflow: scroll">
+              <el-tab-pane label="收藏历史" name="timeline" style="height: 100vh; overflow: scroll">
                 <timeline />
               </el-tab-pane>
-              <el-tab-pane label="操作记录" name="timeline2" style="height: 100vh; overflow: scroll">
+              <el-tab-pane label="浏览历史" name="timeline2" style="height: 100vh; overflow: scroll">
                 <timeline2 />
               </el-tab-pane>
               <el-tab-pane label="账户信息" name="account">
@@ -37,11 +37,12 @@ import UserCard from './components/UserCard'
 import Activity from './components/Activity'
 import Timeline from './components/Timeline'
 import Timeline2 from './components/Timeline2'
+import commentHistory from './components/commentHistory'
 import Account from './components/Account'
 
 export default {
   name: 'Profile',
-  components: { UserCard, Activity, Timeline2, Timeline, Account },
+  components: { UserCard, Activity, Timeline2, Timeline, Account, commentHistory },
   data() {
     return {
       user: {},
