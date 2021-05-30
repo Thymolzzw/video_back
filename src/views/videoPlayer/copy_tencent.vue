@@ -84,8 +84,8 @@
                 <el-checkbox label="7" :disabled=disable[2]>PPT画面转PDF文件</el-checkbox>
                 <el-checkbox label="8" :checked="surface_product">平面产品</el-checkbox>
               </el-checkbox-group>
-              <h4 style="display: inline-block">请选择平面产品打印份数</h4>
-              <el-input-number  :min="0" :max="20" size="mini" v-model="surface_product_num"></el-input-number>
+<!--              <h4 style="display: inline-block">请选择平面产品打印份数</h4>-->
+<!--              <el-input-number  :min="0" :max="20" size="mini" v-model="surface_product_num"></el-input-number>-->
             </div>
             <el-button style="width: 100%; margin-top: 20px" type="primary" @click="export_product()">导出产品</el-button>
           </div>
@@ -105,8 +105,7 @@
             <p><h4 style="display: inline">视频比例：</h4>{{addition_data.video_frame_proportion}}
           </el-tab-pane>
 
-
-          <el-tab-pane label="目标检测"
+          <el-tab-pane v-if="done_functions.object_detection" label="目标检测"
                        v-loading="mubuai_loading"
                        element-loading-text="拼命加载中"
                        element-loading-spinner="el-icon-loading"
@@ -144,11 +143,11 @@
 
           </el-tab-pane>
 
-          <el-tab-pane label="文本识别" style="width: 80%; margin-left: 10%">
+          <el-tab-pane v-if="done_functions.text_detection" label="文本识别" style="width: 80%; margin-left: 10%">
             <div ref="wenben" style="max-height: 688px; overflow: auto">
+              <el-button style="margin-bottom: 10px;" type="primary" @click="get_report_path">点击下载视频报告</el-button>
               <div style="width: 100%; height: auto; border-bottom: 2px solid" v-for="(item, index) in textarea"
-                   :key="index"
-              >
+                   :key="index">
                 <div style="width: 33%;display: inline-block;">
                   <el-image :preview-src-list=[item.image] :src=item.image></el-image>
                 </div>
@@ -165,7 +164,7 @@
 
           </el-tab-pane>
 
-          <el-tab-pane label="人脸检测">
+          <el-tab-pane v-if="done_functions.face_detection" label="人脸检测">
             <div style="height: 800px; background-color: #fcfafa">
               <div id="people_img_name">
 
@@ -240,7 +239,7 @@
             </div>
           </el-tab-pane>
 
-          <el-tab-pane label="关系图谱">
+          <el-tab-pane v-if="done_functions.face_detection" label="关系图谱">
             <div>
               <div style="margin-top:5px;width: calc(100% - 10px);height:calc(100vh - 340px);">
                 <SeeksRelationGraph ref="seeksRelationGraph" :options="graphOptions" :on-node-click="onNodeClick"
@@ -249,7 +248,7 @@
             </div>
           </el-tab-pane>
 
-          <el-tab-pane label="语音识别">
+          <el-tab-pane v-if="done_functions.subtitle" label="语音识别">
             <div style="width: 80%; margin-left: 10%">
               <el-button style="margin-left: 0px;" type="primary" v-on:click="exportRaw('template.txt',textarea1)">导出TXT文本</el-button>
               <div id="word" style="width: 100%; padding-top: 20px; float: right; height: 100%" ref="zimu">
@@ -266,7 +265,7 @@
             </div>
           </el-tab-pane>
 
-          <el-tab-pane label="研讨场景PPT检测">
+          <el-tab-pane v-if="done_functions.ppt" label="研讨场景PPT检测">
             <div style="width: 36%; margin-left: 32%">
               <el-button style="margin-bottom: 10px;" type="primary" @click="get_ppt_pdf_path">点击下载PDF文件</el-button>
               <div style=" height: 700px; max-height: 620px;overflow:auto;">
@@ -278,7 +277,7 @@
             </div>
           </el-tab-pane>
 
-          <el-tab-pane label="声纹检测">
+          <el-tab-pane v-if="done_functions.voice_print" label="声纹检测">
             <div style="width:80%; margin-left:10%">
               <el-button style="margin-left: 0px;" type="primary" v-on:click="exportRaw('template.txt',shengwen_text)">导出TXT文本</el-button>
               <div id="shengwen" style="width: 100%; padding-top: 20px; float: right; height: 100%" ref="shengw">
@@ -335,6 +334,15 @@ export default {
   components: { SeeksRelationGraph, comment},
   data() {
     return {
+      done_functions: {
+        object_detection: false,
+        text_detection: false,
+        face_detection: false,
+        subtitle: false,
+        ppt: false,
+        voice_print: false,
+      },
+
       like_state: 'el-icon-star-off',
 
       // 图谱
@@ -451,6 +459,7 @@ export default {
       this.video_id = 1
     }
     this.dialogInfoVisible = true
+    this.init_functions()
     this.get_video_data()
     this.get_addition_data()
     this.getLikeState()
@@ -458,6 +467,31 @@ export default {
 
   },
   methods: {
+    init_functions(){
+      let param = new FormData()
+      param.append('videoId', this.video_id)
+      axios({
+        method: 'post',
+        url: process.env.VUE_APP_severURL + '/getFunctions',
+        contentType: 'application/x-www-form-urlencoded',
+        data: param,
+      }).then(resp => {
+        // console.log('sss', resp.data.data)
+        if (resp.data.code === 20000){
+          this.done_functions.object_detection = resp.data.data.object_detection
+          this.done_functions.voice_print = resp.data.data.voice_print
+          this.done_functions.ppt = resp.data.data.ppt
+          this.done_functions.subtitle = resp.data.data.subtitle
+          this.done_functions.face_detection = resp.data.data.face_detection
+          this.done_functions.text_detection = resp.data.data.text_detection
+          this.$message({
+            message: '加载成功！',
+            type: 'success'
+          })
+          // console.log(this.done_functions)
+        }
+      })
+    },
     doSend(content){
       // alert(content)
       // console.log('content', content)
@@ -980,9 +1014,45 @@ export default {
     get_shengwen: function() {
       alert(this.value1)
     },
+    get_report_path: function(){
+      // console.log("param", "111")
+      this.function_checkList = []
+      this.function_checkList.push("6")
+      let param = new FormData();
+      param.append('videoId', this.video_id)
+      param.append('functions', this.function_checkList)
+      console.log("param", param)
+      axios({
+        method: 'post',
+        url: process.env.VUE_APP_severURL + '/getProduct',
+        contentType: 'application/x-www-form-urlencoded',
+        data: param,
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+        .then(resp => {
+          window.open(resp.data.data.product_result, 'newwindow')
+        })
+    },
     get_ppt_pdf_path: function() {
       // window.location.href = this.ppt_pdf_path
-      window.open(this.ppt_pdf_path, 'newwindow')
+      // window.open(this.ppt_pdf_path, 'newwindow')
+      // console.log("param", "111")
+      this.function_checkList = []
+      this.function_checkList.push("7")
+      let param = new FormData();
+      param.append('videoId', this.video_id)
+      param.append('functions', this.function_checkList)
+      console.log("param", param)
+      axios({
+        method: 'post',
+        url: process.env.VUE_APP_severURL + '/getProduct',
+        contentType: 'application/x-www-form-urlencoded',
+        data: param,
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+        .then(resp => {
+          window.open(resp.data.data.product_result, 'newwindow')
+        })
     },
     uploadPrivateKey() {
       const privateKeyFile = this.txt_subtitle

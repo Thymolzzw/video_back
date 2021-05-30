@@ -96,7 +96,7 @@
 
       <el-form-item>
         <el-button type="primary" @click="submitUpload">确认提交</el-button>
-        <el-button type="primary" @click="ceshi">ceshi</el-button>
+<!--        <el-button type="primary" @click="ceshi">ceshi</el-button>-->
       </el-form-item>
 
     </el-form>

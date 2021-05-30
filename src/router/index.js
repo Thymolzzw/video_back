@@ -133,6 +133,18 @@ export const constantRoutes = [
       }
     ]
   },
+  // {
+  //   path: '/cross_modal',
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: 'cross_modal',
+  //       component: () => import('@/views/crossModal/modal'),
+  //       name: '检索',
+  //       meta: { title: '检索', icon: 'link' }
+  //     }
+  //   ]
+  // },
   {
     path: '/functions',
     component: Layout,
@@ -297,12 +309,12 @@ export const asyncRoutes = [
         name: 'test',
         meta: { title: '人物关系管理', icon: 'edit' }
       },
-      {
-        path: 'test',
-        component: () => import('@/views/admin_functions/test'),
-        name: 'test',
-        meta: { title: 'test', icon: 'edit' }
-      }
+      // {
+      //   path: 'test',
+      //   component: () => import('@/views/admin_functions/test'),
+      //   name: 'test',
+      //   meta: { title: 'test', icon: 'edit' }
+      // }
     ]
   },
 

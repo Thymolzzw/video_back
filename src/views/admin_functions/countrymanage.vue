@@ -1,7 +1,7 @@
 <template>
   <div id="country_manage">
     <div>
-      <el-button style="margin: 10px;margin-left: 40%" type="primary" icon="el-icon-plus" @click="clickAddcountry()">添加新视频源</el-button>
+      <el-button style="margin: 10px;margin-left: 40%" type="primary" icon="el-icon-plus" @click="clickAddcountry()">添加新国家信息</el-button>
       <el-table :data="country_list"  border style="width: 100%">
         <el-table-column type="index" label="编号" :index="indexMethod" width="80">
         </el-table-column>

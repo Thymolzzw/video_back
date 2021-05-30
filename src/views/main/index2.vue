@@ -18,12 +18,6 @@
               <span>{{ item1.fields.title }}</span>
               <div class="bottom clearfix">
                 <time class="time">{{ item1.fields.create_time }}</time>
-<!--                <p>{{ this.time_2_date(item1.fields.create_time) }}</p>-->
-                <!--                <router-link :to="{ name: 'readDetail', params: { msgKeyOne: 'jump test.' }}">-->
-                <!--                  <button type="button">跳转</button>-->
-<!--                <el-button type="text" class="button">查看视频</el-button>-->
-                <!--                </router-link>-->
-
               </div>
             </div>
           </el-card>
