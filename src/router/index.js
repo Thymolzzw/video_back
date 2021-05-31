@@ -133,6 +133,18 @@ export const constantRoutes = [
       }
     ]
   },
+  {
+    path: '/videoUpload',
+    component: Layout,
+    children: [
+      {
+        path: 'videoUpload',
+        component: () => import('@/views/videoUpload/index'),
+        name: '视频上传',
+        meta: { title: '视频上传', icon: 'link'}
+      }
+    ]
+  },
   // {
   //   path: '/cross_modal',
   //   component: Layout,
@@ -235,12 +247,12 @@ export const asyncRoutes = [
       roles: ['admin', 'editor']
     },
     children: [
-      {
-        path: 'videoUpload',
-        component: () => import('@/views/videoUpload/index'),
-        name: '视频上传',
-        meta: { title: '视频上传', icon: 'link'}
-      },
+      // {
+      //   path: 'videoUpload',
+      //   component: () => import('@/views/videoUpload/index'),
+      //   name: '视频上传',
+      //   meta: { title: '视频上传', icon: 'link'}
+      // },
 
       {
         path: 'videoCtrl',
@@ -251,8 +263,8 @@ export const asyncRoutes = [
       {
         path: 'video_info',
         component: () => import('@/views/admin_functions/video_info'),
-        name: '视频信息修改',
-        meta: { title: '视频信息修改', icon: 'link' }
+        name: '视频基础信息管理',
+        meta: { title: '视频基础信息管理', icon: 'link' }
       },
 
       {
@@ -336,12 +348,12 @@ export const asyncRoutes = [
         name: 'users',
         meta: { title: '用户管理', icon: 'edit' }
       },
-      // {
-      //   path: 'people',
-      //   component: () => import('@/views/manage/people'),
-      //   name: 'people',
-      //   meta: { title: '人物管理', icon: 'edit' }
-      // },
+      {
+        path: 'comment',
+        component: () => import('@/views/manage/comment'),
+        name: 'comment',
+        meta: { title: '评论管理', icon: 'edit' }
+      },
       //
       // {
       //   path: 'power',

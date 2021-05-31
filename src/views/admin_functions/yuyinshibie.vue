@@ -132,15 +132,11 @@ export default {
       this.video_id = this.promoList[s].pk
       let param = new URLSearchParams()
       param.append('videoId', this.video_id)
-      let config = {
-        headers: { 'Accept-Ranges': 'bytes' }
-      }
       axios({
         method: 'get',
         url: process.env.VUE_APP_severURL + '/getSubTitleForUpdate',
         contentType: 'application/x-www-form-urlencoded',
         params: param,
-        headers: config.headers
       })
         .then(resp => {
           // var subTitle = JSON.stringify(resp.data.subTitle)

@@ -31,7 +31,7 @@
             :auto-upload="false"
             :headers ="upload_headers"
             :file-list="filelist"
-            action="/api/videos/upload"
+            :action="upload_url"
             accept="audio/mp4,video/mp4, video/mkv,.mkv"
             :on-success = "handleSuccess"
             :on-error	= "()=>{loading = false}"
@@ -88,8 +88,30 @@
           </el-select>
 
           <br>
-          <h4 style="display: inline-block; margin-right: 20px;">请填写视频标签</h4>
-          <el-input style="width: 100px;" v-model="video_tag"></el-input>
+<!--          <h4 style="display: inline-block; margin-right: 20px;">请填写视频标签</h4>-->
+<!--          <el-input style="width: 100px;" v-model="video_tag"></el-input>-->
+          <br><h4 style="display: inline-block; margin-right: 20px;">请填写视频标签</h4>
+          <div style="display: inline-block">
+            <el-tag
+              :key="tag"
+              v-for="tag in tag_list"
+              closable
+              :disable-transitions="false"
+              @close="handleClose(tag)">
+              {{tag}}
+            </el-tag>
+            <el-input style="width: 80px"
+              class="input-new-tag"
+              v-if="inputVisible"
+              v-model="inputValue"
+              ref="saveTagInput"
+              size="small"
+              @keyup.enter.native="handleInputConfirm"
+              @blur="handleInputConfirm"
+            >
+            </el-input>
+            <el-button v-else class="button-new-tag" size="small" @click="showInput">+ New Tag</el-button>
+          </div>
         </div>
       </div>
 
@@ -115,6 +137,8 @@ const functions2 = [[0, '人脸识别'], [1, '目标检测与识别'], [2, 'PPT�
 export default {
   data() {
     return {
+      upload_url: process.env.VUE_APP_severURL + '/uploadvideo',
+
       //配置minxin种curd api方法：
       newMethod: createVideo,
       deleteMethod: deleteVideo,
@@ -125,7 +149,12 @@ export default {
       load_line: 0,
       line_color_1:'',
       file:'',
+
       video_tag: '',
+      tag_list: [],
+      inputVisible: false,
+      inputValue: '',
+
       //配置mixin query
       resource_name: 'video',
       functions: functions,
@@ -169,6 +198,24 @@ export default {
   created() {
   },
   methods: {
+    handleClose(tag) {
+      this.tag_list.splice(this.tag_list.indexOf(tag), 1);
+    },
+    showInput() {
+      this.inputVisible = true;
+      this.$nextTick(_ => {
+        this.$refs.saveTagInput.$refs.input.focus();
+      });
+    },
+    handleInputConfirm() {
+      let inputValue = this.inputValue;
+      if (inputValue) {
+        this.tag_list.push(inputValue);
+      }
+      this.inputVisible = false;
+      this.inputValue = '';
+    },
+
     ceshi(){
       var funcs = this.checkboxGroup1//.concat(this.checkboxGroup2)
       var compare = function (x, y) {//比较函数
@@ -224,9 +271,11 @@ export default {
     handleFileChange(file, fileList) {
       if (file.status === 'ready') {
         this.thumb_filename  = undefined
+        alert('jinru')
         this.file = file
         this.query.title = file.raw.name
       }
+      this.fileList = fileList
     },
 
     //当文件上传成功后
@@ -266,7 +315,7 @@ export default {
         return
       }
       if(this.video_tag === ''){
-        this.video_tag = '无标签'
+        this.video_tag = ''
       }
       this.line_color_1 = "primary"
       this.dialogVisible = true
@@ -276,18 +325,18 @@ export default {
       this.sorted_list = this.get_sorted_list()
 
       formdata.append('file', this.file.raw)
-      alert(this.query.title)
+      // console.log('formdata', this.file.raw)
       formdata.append('title', this.query.title)
       formdata.append('functions', this.sorted_list)
+      // console.log('formdata', this.sorted_list)
       formdata.append('source', this.source_value)
-      formdata.append('tag', this.video_tag)
-      console.log(this.file.raw)
+      formdata.append('tag', JSON.stringify(this.tag_list))
+      console.log('this.tag_list', this.tag_list)
+
       let that = this
       axios({
-        url: process.env.VUE_APP_severURL + '/uploadvideo',
+        url: this.upload_url,
         method: "post",
-        // baseURL: process.env.VUE_APP_BASE_API,
-        headers: { 'Content-Type': 'multipart/form-data' },
         data: formdata,
         onUploadProgress: function (progressEvent) {
           var now_progress = (Math.floor(progressEvent.loaded / progressEvent.total * 100) * 0.90).toFixed(2)
