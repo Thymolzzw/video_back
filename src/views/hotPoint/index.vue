@@ -38,9 +38,9 @@ export default {
           console.log(res.data.data)
           this.promoList = res.data.data
           this.promoList.reverse()
-          while(this.promoList.length > 10){
-            this.promoList.pop()
-          }
+          // while(this.promoList.length > 10){
+          //   this.promoList.pop()
+          // }
         })
     },
     to_play_video: function (event) {

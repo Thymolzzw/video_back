@@ -18,7 +18,7 @@
 
     <el-form ref="form" label-width="80px" >
       <!--:model="form"-->
-      <el-form-item label="视频标题:">
+      <el-form-item label="视频标题:" style="width: 30%">
         <el-input v-model="query.title" placeholder="请输入视频标题"></el-input>
       </el-form-item>
       <div>
@@ -57,22 +57,16 @@
           </el-upload>
         </el-form-item>
 
-        <div>
+        <div style="width: 35%;">
           <el-checkbox-group v-model="checkboxGroup1">
-            <div style="width: 200px;" v-for="(fun, index) in functions" :label="fun" :key="fun">
+            <div style="display: inline-block" v-for="(fun, index) in functions" :label="fun" :key="fun">
               <el-checkbox-button style="width: 100%" border :label="index" :key="index">{{index+1}} - {{fun}}</el-checkbox-button>
             </div>
-
           </el-checkbox-group>
-<!--          <el-checkbox-group v-model="checkboxGroup2">-->
-<!--            <el-checkbox-button border v-for="fun in functions2" :label="fun" :key="fun">{{fun}}</el-checkbox-button>-->
-<!--          </el-checkbox-group>-->
         </div>
 
         <div style="margin-top: 20px;margin-bottom: 15px;">
           <h4 style="display: inline-block; margin-right: 20px;">请选择视频来源</h4>
-
-<!--          allow-create-->
           <el-select
             style="display: inline-block"
             v-model="source_value"
@@ -86,10 +80,6 @@
               :value="item.value">
             </el-option>
           </el-select>
-
-          <br>
-<!--          <h4 style="display: inline-block; margin-right: 20px;">请填写视频标签</h4>-->
-<!--          <el-input style="width: 100px;" v-model="video_tag"></el-input>-->
           <br><h4 style="display: inline-block; margin-right: 20px;">请填写视频标签</h4>
           <div style="display: inline-block">
             <el-tag
@@ -100,7 +90,7 @@
               @close="handleClose(tag)">
               {{tag}}
             </el-tag>
-            <el-input style="width: 80px"
+            <el-input style="width: 100px"
               class="input-new-tag"
               v-if="inputVisible"
               v-model="inputValue"
