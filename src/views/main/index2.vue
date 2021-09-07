@@ -72,6 +72,7 @@ export default ({
         })
     },
     to_play_video: function (event) {
+      console.log('src/views/main/index2.vue 开始播放视频')
       let param = new URLSearchParams()
       param.append('videoId', event)
       param.append('user_id', store.state.user.user_info.id)
@@ -82,7 +83,6 @@ export default ({
         params: param,
       }).then(resp => {
           if(resp.data.code === 20000){
-
             this.$router.push({
               path: '/player',
               name: '视频播放详情页',

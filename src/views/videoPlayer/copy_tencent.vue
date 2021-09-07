@@ -24,7 +24,7 @@
                         @timeupdate="onPlayerTimeupdate($event)"
                         @ready="playerReadied"
           >
-            <track style="width: 200px;" kind="captions" :src=subtitle srclang="en" label="English"/>
+            <track style="width: 200px;" kind="captions" :src="subtitle" srclang="en" label="English"/>
           </video-player>
         </div>
 
@@ -93,7 +93,7 @@
       </div>
 
       <div style="width: 100%; display: block;vertical-align:top; margin-left: 4%;margin-top: 5px;">
-        <el-tabs stretch="true" id="videoTabs" style="width: 100%" @tab-click="handleClick">
+        <el-tabs :stretch="true" id="videoTabs" style="width: 100%" @tab-click="handleClick">
           <el-tab-pane style="text-align: left; font-size: larger" label="视频信息">
             <h4 style="display: inline">视频标题：</h4>{{video_title}}
             <p><h4 style="display: inline">视频来源：</h4>{{addition_data.source_name}}
@@ -324,10 +324,9 @@
 import 'videojs-flash'
 import axios from 'axios'
 import html2canvas from 'html2canvas'
-import jspdf from 'jspdf'
 import { formatSeconds } from '@/api/time'
-import SeeksRelationGraph from "relation-graph";
 import store from "@/store";
+import SeeksRelationGraph from "relation-graph";
 import comment from '../../components/bright-comment/dist/bright.comment'
 export default {
   name: 'SeeksRelationGraphDemo',
@@ -455,6 +454,8 @@ export default {
   },
   mounted() {
     this.video_id = this.$route.query.video_id
+    console.log('this.init_functions()')
+    console.log('src/views/VideoPlayer/copy_tencent.vue',this.video_id)
     if (this.video_id === undefined) {
       this.video_id = 1
     }
@@ -476,10 +477,11 @@ export default {
         contentType: 'application/x-www-form-urlencoded',
         data: param,
       }).then(resp => {
-        // console.log('sss', resp.data.data)
+        console.log('videoPlayer/copy_tencent.vue init_functions()', resp.data.data)
         if (resp.data.code === 20000){
           this.done_functions.object_detection = resp.data.data.object_detection
           this.done_functions.voice_print = resp.data.data.voice_print
+          console.log('11111111111111111111111',this.done_functions.voice_print)
           this.done_functions.ppt = resp.data.data.ppt
           this.done_functions.subtitle = resp.data.data.subtitle
           this.done_functions.face_detection = resp.data.data.face_detection
@@ -569,7 +571,7 @@ export default {
     },
 
     handleClick(tab, event) {
-      console.log('tabs', tab.label, event);
+      console.log('VideoPlayer/copy_tencent.vue tabs', tab.label, event);
       if(tab.label === '关系图谱'){
         this.setGraphData()
         this.$message({
@@ -593,7 +595,7 @@ export default {
 
     // 图谱
     onNodeClick(nodeObject, $event) {
-      console.log('onNodeClick:', nodeObject.text)
+      console.log('VideoPlayer/copy_tencent.vue onNodeClick:', nodeObject.text)
       const h = this.$createElement;
       this.$notify({
         title: '节点信息',
@@ -601,7 +603,7 @@ export default {
       });
     },
     onLineClick(lineObject, $event) {
-      console.log('onLineClick:', lineObject)
+      console.log('VideoPlayer/copy_tencent.vue onLineClick:', lineObject)
       const h = this.$createElement;
       this.$notify({
         title: '线条信息',
@@ -747,9 +749,21 @@ export default {
     },
     onPlayerPause(player) {
       // 监听暂停
-      console.log('暂停')
+      console.log('copy_tencent.vue 暂停')
       // 暂停时时间
       this.$emit('onPlayerPauseFun', player)
+    },
+    onPlayerPlay(player){
+      console.log('player play!')
+    },
+    playerStateChanged(player){
+      // console.log('player state changed!', player)
+    },
+    onPlayerLoadeddata(player){
+      // console.log('player load data', player)
+    },
+    onPlayerTimeupdate(player){
+      // console.log('player timr update!', player)
     },
     time_2_date: function (stamp) {
       var date1 = new Date(stamp)
@@ -1021,7 +1035,7 @@ export default {
       let param = new FormData();
       param.append('videoId', this.video_id)
       param.append('functions', this.function_checkList)
-      console.log("param", param)
+      console.log("VideoPlayer/copy_tencent.vue param", param)
       axios({
         method: 'post',
         url: process.env.VUE_APP_severURL + '/getProduct',
@@ -1042,7 +1056,7 @@ export default {
       let param = new FormData();
       param.append('videoId', this.video_id)
       param.append('functions', this.function_checkList)
-      console.log("param", param)
+      console.log("VideoPlayer/copy_tencent.vue param", param)
       axios({
         method: 'post',
         url: process.env.VUE_APP_severURL + '/getProduct',
@@ -1068,7 +1082,7 @@ export default {
       var _this = this
       reader.onload = function(e) {
         console.log('密钥文件内容')
-        console.log(e.target.result)
+        console.log('VideoPlayer/copy_tencent.vue e.target.result',e.target.result)
         _this.textarea1 = e.target.result
       }
     },
@@ -1082,7 +1096,7 @@ export default {
         'height': 841
       })
         .then(canvas => {
-          console.log(canvas)
+          console.log('VideoPlayer/copy_tencent.vue canvas',canvas)
           let contentWidth = canvas.width // 592px
           let contentHeight = canvas.height // 841px
           //一页pdf显示html页面生成的canvas高度;

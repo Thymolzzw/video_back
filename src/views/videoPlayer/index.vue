@@ -202,6 +202,7 @@ export default {
   mounted() {
     // this.$refs.videoPlayer.player.src(this.$route.query.video_url)
     this.video_id = this.$route.query.video_id
+    console.log('src/views/VideoPlayer/index.vue',this.video_id)
     if (this.video_id === undefined) {
       this.video_id = 1
     }
@@ -214,10 +215,22 @@ export default {
   methods: {
     onPlayerPause(player) {
       // 监听暂停
-      console.log('暂停')
+      console.log('index.vue 暂停')
       // 暂停时时间
       // console.log(player.duration());
       this.$emit('onPlayerPauseFun', player)
+    },
+    onPlayerPlay(player){
+
+    },
+    playerStateChanged(player){
+
+    },
+    onPlayerLoadeddata(player){
+
+    },
+    onPlayerTimeupdate(player){
+
     },
     fakeClick(obj) {
       var ev = document.createEvent('MouseEvents')

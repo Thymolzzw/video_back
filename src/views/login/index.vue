@@ -4,7 +4,7 @@
       <h3 class="title">视音频数据智能分析原型系统</h3>
     </div>
 
-    <el-tabs style="width: 500px; margin-left: calc(50% - 250px); background-color: #2d3a4b; border-color: #2d3a4b; margin-top: 50px" type="border-card" v-model="activeTab" stretch="true">
+    <el-tabs style="width: 500px; margin-left: calc(50% - 250px); background-color: #2d3a4b; border-color: #2d3a4b; margin-top: 50px" type="border-card" v-model="activeTab" :stretch="true">
 
       <el-tab-pane style="border-color: #2d3a4b" label="登录" name="login">
 

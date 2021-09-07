@@ -5,11 +5,11 @@
       :visible.sync="dialogVisible"
       width="30%"
       :before-close="handleClose"
-      close-on-click-modal=false
-      close-on-press-escape=false
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
     >
       <span>视频正在上传至服务器，进度条变绿前请勿关闭此提示</span>
-      <el-progress :text-inside="true" :stroke-width="24" :percentage=load_line :status=line_color_1></el-progress>
+      <el-progress :text-inside="true" :stroke-width="24" :percentage="parseFloat(load_line)" :status="line_color_1"></el-progress>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">关  闭</el-button>
         <!--        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>-->
@@ -137,7 +137,7 @@ export default {
       queryMethod: queryVideos,
       dialogVisible: false,
       load_line: 0,
-      line_color_1:'',
+      line_color_1:null,
       file:'',
 
       video_tag: '',
@@ -307,7 +307,7 @@ export default {
       if(this.video_tag === ''){
         this.video_tag = ''
       }
-      this.line_color_1 = "primary"
+      // this.line_color_1 = "primary"
       this.dialogVisible = true
       //1.上传视频
       this.loading = true
@@ -321,7 +321,7 @@ export default {
       // console.log('formdata', this.sorted_list)
       formdata.append('source', this.source_value)
       formdata.append('tag', JSON.stringify(this.tag_list))
-      console.log('this.tag_list', this.tag_list)
+      console.log('videoUpload/index.vue this.tag_list', this.tag_list)
 
       let that = this
       axios({
@@ -342,6 +342,7 @@ export default {
           // }
         },
       }).then((resp)=>{
+        console.log('videoUpload/index.vue response')
         that.handleSuccess(resp.data)
       })//.finally((resp)=>{
       //   that.handleSuccess(resp.data,'','')

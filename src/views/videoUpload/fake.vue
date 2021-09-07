@@ -5,8 +5,8 @@
       :visible.sync="dialogVisible"
       width="30%"
       :before-close="handleClose"
-      close-on-click-modal=false
-      close-on-press-escape=false
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
     >
       <span>视频正在上传至服务器，进度条变绿前请勿关闭此提示</span>
       <el-progress :text-inside="true" :stroke-width="24" :percentage=load_line :status=line_color_1></el-progress>
