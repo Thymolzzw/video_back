@@ -5,6 +5,7 @@ export function login(data) {
   let login_data = new FormData()
   login_data.append("username", data.username)
   login_data.append("password", data.password)
+  console.log('URL:',process.env.VUE_APP_severURL)
   return request({
     url: process.env.VUE_APP_severURL + '/doLogin',
     method: 'post',

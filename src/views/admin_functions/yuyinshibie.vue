@@ -68,6 +68,7 @@ export default {
     }
   },
   mounted() {
+    console.log('src/views/admin_functions/yuyinshibie.vue')
     this.get_videos()
   },
   name: 'index',
@@ -129,7 +130,7 @@ export default {
     },
 
     get_subtitle: function(s) {
-      this.video_id = this.promoList[s].pk
+      this.video_id = this.promoList[s].id
       let param = new URLSearchParams()
       param.append('videoId', this.video_id)
       axios({
@@ -150,21 +151,20 @@ export default {
             this.subtitle_list.push(this.sub_obj[i].content)
             // alert(this.sub_obj[i].content)
           }
-          this.video_id = this.promoList[this.video_value].pk
+          this.video_id = this.promoList[this.video_value].id
 
         })
     },
     get_videos: function () {
       axios.get(process.env.VUE_APP_severURL + '/getAllVideos')
         .then(res => {
-          // console.log(res.data.data)
-          this.promoList = res.data.data
+          this.promoList = res.data.video_items
           let len = this.promoList.length
           let temp = {}
           for (let i = 0; i < len; ++i){
             temp = {
               value: '',
-              label: this.promoList[i].fields.title
+              label: this.promoList[i].title
             }
             this.videos.push(temp)
           }
@@ -176,5 +176,7 @@ export default {
 </script>
 
 <style scoped>
-
+.el-button{
+  margin-left: 10px;
+}
 </style>

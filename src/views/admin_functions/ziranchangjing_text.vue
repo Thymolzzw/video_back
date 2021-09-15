@@ -65,12 +65,13 @@ export default {
     }
   },
   mounted() {
+    console.log('src/views/admin_functions/ziranchagnjing_text.vue')
     this.get_videos()
   },
   name: 'index',
   methods: {
     update_item: function(index){
-      alert(index+'#'+this.video_id)
+      //alert(index+'#'+this.video_id)
 
       let param = new FormData()
       param.append('videoId', this.video_id)
@@ -115,11 +116,6 @@ export default {
 
         })
     },
-    atext: function(s) {
-      var pk = this.promoList[s].pk
-      this.video_id = this.promoList[s].pk
-      alert(pk)
-    },
     confirm_update: function() {
       this.$alert('审核成功', '审核结果', {
         confirmButtonText: '确定',
@@ -160,7 +156,7 @@ export default {
     },
 
     get_subtitle: function(s) {
-      this.video_id = this.promoList[s].pk
+      this.video_id = this.promoList[s].id
       // alert(this.video_id)
       let param = new URLSearchParams()
       param.append('videoId', this.video_id)
@@ -188,7 +184,7 @@ export default {
             this.ocr_list.push(this.sub_obj[i].content)
             this.ocr_img_list.push(this.sub_obj[i].image)
           }
-          this.video_id = this.promoList[this.video_value].pk
+          this.video_id = this.promoList[this.video_value].id
           // alert(this.subtitle_list)
         })
     },
@@ -199,14 +195,13 @@ export default {
     get_videos: function () {
       axios.get(process.env.VUE_APP_severURL + '/getAllVideos')
         .then(res => {
-          // console.log(res.data.data)
-          this.promoList = res.data.data
+          this.promoList = res.data.video_items
           let len = this.promoList.length
           let temp = {}
           for (let i = 0; i < len; ++i){
             temp = {
               value: '',
-              label: this.promoList[i].fields.title
+              label: this.promoList[i].title
             }
             this.videos.push(temp)
           }
@@ -218,5 +213,7 @@ export default {
 </script>
 
 <style scoped>
-
+.el-button{
+  margin-left: 10px;
+}
 </style>

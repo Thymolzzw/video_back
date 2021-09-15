@@ -1,5 +1,5 @@
 <template>
-  <div id="video_info">
+  <div class="video_info">
     <div id="select_list">
       <el-select v-model="video_value" filterable placeholder="请选择">
         <el-option
@@ -12,7 +12,6 @@
         </el-option>
       </el-select>
       <el-button type="primary" @click="get_addition_data(video_value)">加载</el-button>
-      <el-button type="primary" @click="atext(video_value)">测试</el-button>
     </div>
 
     <div>
@@ -67,7 +66,7 @@
               <el-button v-else class="button-new-tag" size="small" @click="showInput">+ New Tag</el-button>
             </div>
 
-            <el-input v-else="" type="textarea" v-model="scope.row.new_value"></el-input>
+            <el-input v-else type="textarea" v-model="scope.row.new_value"></el-input>
 
 
           </template>
@@ -78,33 +77,9 @@
           </template>
         </el-table-column>
       </el-table>
-
-
-
-
-
-
     </div>
   </div>
 </template>
-
-<style>
-.el-tag + .el-tag {
-  margin-left: 10px;
-}
-.button-new-tag {
-  margin-left: 10px;
-  height: 32px;
-  line-height: 30px;
-  padding-top: 0;
-  padding-bottom: 0;
-}
-.input-new-tag {
-  width: 90px;
-  margin-left: 10px;
-  vertical-align: bottom;
-}
-</style>
 
 <script>
 import axios from 'axios'
@@ -137,6 +112,7 @@ export default {
     }
   },
   mounted() {
+    console.log('src/views/admin_functions/video_info.vue')
     this.get_videos()
     this.getCountryList()
     this.getResourceList()
@@ -160,9 +136,6 @@ export default {
       this.inputVisible = false;
       this.inputValue = '';
     },
-
-
-
     getResourceList:function (){
       this.resource_list = []
       let config = {
@@ -191,10 +164,6 @@ export default {
       }).then(resp => {
           this.country_list = resp.data.data
         })
-    },
-    atext: function(s) {
-      var pk = this.promoList[s].pk
-      alert(pk)
     },
     change_data: function(row, index) {
       let param = new FormData()
@@ -252,7 +221,7 @@ export default {
     get_addition_data: function(s) {
       this.tableData = []
       let param = new URLSearchParams()
-      param.append('videoId', this.promoList[s].pk)
+      param.append('videoId', this.promoList[s].id)
       let config = {
         headers: { 'Accept-Ranges': 'bytes' }
       }
@@ -281,16 +250,17 @@ export default {
           })
           let tag_str = ''
           this.tag_list = []
-          for(let i=0;i<resp.data.addition_data.video_tag.length;i++){
-            this.tag_list.push(resp.data.addition_data.video_tag[i])
-            tag_str += resp.data.addition_data.video_tag[i] + ' '
+          if(this.addition_data.video_tag != null){
+            for(let i=0;i< this.addition_data.video_tag.length;i++){
+              this.tag_list.push(this.addition_data.video_tag[i])
+              tag_str += this.addition_data.video_tag[i] + ' '
+            }
           }
           this.tableData.push({
             items: "视频标签",
             value: tag_str
           })
-          // alert(this.tag_list)
-          this.video_id = this.promoList[s].pk
+          this.video_id = this.promoList[s].id
         })
     },
 
@@ -300,14 +270,13 @@ export default {
     get_videos: function () {
       axios.get(process.env.VUE_APP_severURL + '/getAllVideos')
         .then(res => {
-          // console.log(res.data.data)
-          this.promoList = res.data.data
+          this.promoList = res.data.video_items
           let len = this.promoList.length
           let temp = {}
           for (let i = 0; i < len; ++i){
             temp = {
               value: '',
-              label: this.promoList[i].fields.title
+              label: this.promoList[i].title
             }
             this.videos.push(temp)
           }
@@ -319,5 +288,27 @@ export default {
 </script>
 
 <style scoped>
-
+.video_info{
+  margin-top: 10px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+.el-button{
+  margin-left: 10px;
+}
+.el-tag + .el-tag {
+  margin-left: 10px;
+}
+.button-new-tag {
+  margin-left: 10px;
+  height: 32px;
+  line-height: 30px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.input-new-tag {
+  width: 90px;
+  margin-left: 10px;
+  vertical-align: bottom;
+}
 </style>

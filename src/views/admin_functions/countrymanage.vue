@@ -72,6 +72,7 @@ export default {
     }
   },
   mounted() {
+    console.log('src/views/admin_functions/countrymanage.vue')
     this.getcountryList()
 
   },

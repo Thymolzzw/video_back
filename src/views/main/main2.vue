@@ -62,6 +62,7 @@ export default ({
 
   },
   mounted() {
+    console.log('src/views/main/main2.vue')
     this.get_banners()
     this.get_videos()
   },

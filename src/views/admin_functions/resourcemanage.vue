@@ -81,6 +81,7 @@ export default {
     }
   },
   mounted() {
+    console.log('src/views/admin_functions/resourcemanage.vue')
     this.getResourceList()
 
   },

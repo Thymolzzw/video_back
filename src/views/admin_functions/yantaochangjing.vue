@@ -12,7 +12,6 @@
         </el-option>
       </el-select>
       <el-button type="primary" @click="get_ppt_imgs(video_value)">加载</el-button>
-      <el-button type="primary" @click="atext(video_value)">测试</el-button>
       <el-button type="primary" style="margin-left: 10px" @click="confirm_update(video_value)">确认审核</el-button>
       <el-button type="primary" style="margin-left: 10px" @click="update_ppt(video_value)">保存修改</el-button>
     </div>
@@ -50,15 +49,12 @@ export default {
     }
   },
   mounted() {
+    console.log('src/views/admin_functions/yantaochangjing.vue')
     this.get_videos()
 
   },
   name: 'index',
   methods: {
-    atext: function(s) {
-      var pk = this.promoList[s].pk
-      alert(pk)
-    },
     confirm_update: function() {
       this.$alert('审核成功', '审核结果', {
         confirmButtonText: '确定',
@@ -73,7 +69,7 @@ export default {
       // this.$refs.ppts[index] = ''
       // alert(this.ppt_imgs)
       let param = new FormData()
-      param.append('videoId', this.promoList[this.video_value].pk)
+      param.append('videoId', this.promoList[this.video_value].id)
       param.append('del_index', index)
       axios({
         method: 'post',
@@ -127,7 +123,7 @@ export default {
     },
     get_ppt_imgs: function(s) {
       let param = new URLSearchParams()
-      param.append('videoId', this.promoList[s].pk)
+      param.append('videoId', this.promoList[s].id)
       let config = {
         headers: { 'Accept-Ranges': 'bytes' }
       }
@@ -149,7 +145,7 @@ export default {
 
     update_ppt_imgs: function(s) {
       let param = new FormData()
-      param.append('videoId', this.promoList[s].pk)
+      param.append('videoId', this.promoList[s].id)
       let config = {
         headers: { 'Accept-Ranges': 'bytes' }
       }
@@ -171,18 +167,16 @@ export default {
     get_videos: function () {
       axios.get(process.env.VUE_APP_severURL + '/getAllVideos')
         .then(res => {
-          // console.log(res.data.data)
-          this.promoList = res.data.data
+          this.promoList = res.data.video_items
           let len = this.promoList.length
           let temp = {}
           for (let i = 0; i < len; ++i){
             temp = {
               value: '',
-              label: this.promoList[i].fields.title
+              label: this.promoList[i].title
             }
             this.videos.push(temp)
           }
-          console.log()
         })
     },
   }
@@ -190,5 +184,7 @@ export default {
 </script>
 
 <style scoped>
-
+.el-button{
+  margin-left: 10px;
+}
 </style>

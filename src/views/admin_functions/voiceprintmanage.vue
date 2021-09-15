@@ -55,6 +55,7 @@ export default {
     }
   },
   mounted() {
+    console.log('src/views/admin_functions/voiceprintmanage.vue')
     this.get_videos()
     this.get_people_list()
   },
@@ -82,7 +83,7 @@ export default {
 
     },
     getVoicePrintData(value){
-      this.video_id = this.promoList[value].pk
+      this.video_id = this.promoList[value].id
       // alert(this.video_id)
       let param = new URLSearchParams()
       param.append('videoId', this.video_id)
@@ -97,7 +98,7 @@ export default {
         headers: config.headers
       }).then(resp => {
           this.voiceprintList = resp.data.data
-          this.video_id = this.promoList[this.video_value].pk
+          this.video_id = this.promoList[this.video_value].id
       })
 
 
@@ -105,14 +106,13 @@ export default {
     get_videos: function () {
       axios.get(process.env.VUE_APP_severURL + '/getAllVideos')
         .then(res => {
-          // console.log(res.data.data)
-          this.promoList = res.data.data
+          this.promoList = res.data.video_items
           let len = this.promoList.length
           let temp = {}
           for (let i = 0; i < len; ++i){
             temp = {
               value: '',
-              label: this.promoList[i].fields.title
+              label: this.promoList[i].title
             }
             this.videos.push(temp)
           }
@@ -130,5 +130,7 @@ export default {
 </script>
 
 <style scoped>
-
+.el-button{
+  margin-left: 10px;
+}
 </style>

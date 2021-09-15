@@ -142,6 +142,7 @@ export default {
     }
   },
   mounted() {
+    console.log('src/views/admin_functions/face.vue')
     this.get_videos()
     this.get_people_list()
   },
@@ -196,10 +197,6 @@ export default {
           });
       })
     },
-    atext: function(s) {
-      var pk = this.promoList[s].pk
-      alert(pk)
-    },
     change_persion: function(index) {
       this.people_name = this.people_data[index].people_name
       this.tableData = this.people_data[index].tableData
@@ -214,7 +211,7 @@ export default {
       this.head_img = ''
       this.people_index = 0
 
-      this.video_id = this.promoList[s].pk
+      this.video_id = this.promoList[s].id
       this.people_data = []
       let param = new URLSearchParams()
       param.append('videoId', this.video_id)
@@ -271,18 +268,16 @@ export default {
     get_videos: function () {
       axios.get(process.env.VUE_APP_severURL + '/getAllVideos')
         .then(res => {
-          // console.log(res.data.data)
-          this.promoList = res.data.data
+          this.promoList = res.data.video_items
           let len = this.promoList.length
           let temp = {}
           for (let i = 0; i < len; ++i){
             temp = {
               value: '',
-              label: this.promoList[i].fields.title
+              label: this.promoList[i].title
             }
             this.videos.push(temp)
           }
-          console.log()
         })
     },
   }
@@ -290,5 +285,7 @@ export default {
 </script>
 
 <style scoped>
-
+.el-button{
+  margin-left: 10px;
+}
 </style>

@@ -45,6 +45,7 @@ export default ({
 
   },
   mounted() {
+    console.log('src/views/functioons/videoCtrl.vue')
     this.get_videos()
   },
   methods: {

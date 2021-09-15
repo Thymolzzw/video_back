@@ -114,6 +114,7 @@ export default {
     }
   },
   mounted() {
+    console.log('src/views/admin_functions/people_relation_manage.vue')
     this.getPeopleRelationList()
     this.getPeopleList()
   },

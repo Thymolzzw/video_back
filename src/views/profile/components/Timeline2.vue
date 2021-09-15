@@ -45,7 +45,7 @@ export default {
     }
   },
   mounted() {
-    // alert(store.state.user.user_info.id)
+    console.log('src/views/profile/Timeline2.vue')
     this.getMyHistory()
   },
   methods: {

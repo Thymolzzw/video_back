@@ -46,6 +46,7 @@ export default {
   },
   mounted() {
     // alert(store.state.user.user_info.avatar)
+    console.log('src/views/profile/commentHistory.vue')
     this.getComments()
   },
   methods: {

@@ -1,7 +1,5 @@
 <template>
   <div id="user">
-<!--    <el-input style="width: 20%" v-model="search_text"></el-input>-->
-<!--    <el-button type="primary" @click="searchUser()">搜索</el-button>-->
     <el-button style="margin-left: 71vh; width: 15vh; margin-top: 10px" type="primary" @click="addUserVisible = true">添加用户</el-button>
 
     <el-table
@@ -75,7 +73,7 @@
     <el-dialog title="信息修改" :visible.sync="dialogFormVisible">
       <el-form :model="form" ref="form" :rules="formRules" class="login-form">
         <el-form-item label="账户ID" label-width="188px">
-          <el-input disabled="true" v-model="form.id" autocomplete="off"></el-input>
+          <el-input :disabled="true" v-model="form.id" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item prop="account_name" label="账户名" label-width="188px">
           <el-input v-model="form.account_name" autocomplete="off"></el-input>
@@ -285,6 +283,7 @@ export default {
     }
   },
   mounted() {
+    console.log('src/views/manage/user_temp.vue')
     this.getAllUsers()
   },
   methods: {
@@ -327,9 +326,9 @@ export default {
       })
     },
 
-    indexMethod: function(index) {
-      return ++index;
-    },
+    // indexMethod: function(index) {
+    //   return ++index;
+    // },
     disable_dialog: function() {
       this.dialogFormVisible = false
       this.form = {
@@ -438,8 +437,6 @@ export default {
 
             }).then(resp => {
               if(resp.data.code === 20000){
-
-                console.log(resp.data.data)
                 console.log(this.row_data)
                 this.tableData[this.row_data] = resp.data.data[0]
                 this.tableData.splice(0,0)

@@ -12,12 +12,25 @@
     <div id="video_list">
       <el-row>
         <el-col :span="5.5" v-for="(item1, index) in promoList" :key="index" style="padding: 10px" >
-          <el-card style="height: 230px; width: 300px" :body-style="{ padding: '2px' }" shadow="hover" @click.native="to_play_video(item1.pk)">
-            <img style="height: 150px" :src="item1.fields.snapshoot_img" class="image">
+          <el-card style="height: 250px; width: 280px" :body-style="{ padding: '2px' }" shadow="hover" @click.native="to_play_video(item1.id)">
+            <img style="height:150px;border-radius:8px" :src="item1.snapshoot_img" class="image">
             <div style="padding: 14px;">
-              <span>{{ item1.fields.title }}</span>
+              <span>{{ item1.title }}</span>
               <div class="bottom clearfix">
-                <time class="time">{{ item1.fields.create_time }}</time>
+                <img src='@/assets/video.png' alt=''>
+                <p>{{item1.video_time}}</p>
+                <img src='@/assets/source.png' alt=''>
+                <p>{{item1.source}}</p>
+                <img src='@/assets/clock.png' alt=''>
+                <p class="time">{{item1.create_time}}</p>
+              </div>
+              <div class='function'>
+                <p>功能：</p>
+                <div class='function_items' v-for='(item,index) in item1.functions' :key="index">
+                  <el-tooltip class='item' effect="dark" :content="function_imgs[item].label" placement="right">
+                    <img class='funcImg' :src='function_imgs[item].path' alt=''>
+                  </el-tooltip>
+                </div>
               </div>
             </div>
           </el-card>
@@ -36,18 +49,22 @@ export default ({
     return{
       banners: [],
       promoList: [],
+      function_imgs:[{path:require('@/assets/f1.png'),label:'人脸检测'}, 
+                     {path:require('@/assets/f2.png'),label:'目标检测与识别'}, 
+                     {path:require('@/assets/f3.png'),label:'PPT画面检测'}, 
+                     {path:require('@/assets/f4.png'),label:'自然场景文本识别'}, 
+                     {path:require('@/assets/f5.png'),label:'语音识别与翻译'}, 
+                     {path:require('@/assets/f6.png'),label:'声纹识别'}],
       currentDate: new Date()
     }
   },
   computed: {
-    // player() {
-    // return this.$refs.videoPlayer.player
-    // }
   },
   created() {
 
   },
   mounted() {
+    console.log('src/views/main/index2.vue')
     this.get_banners()
     this.get_videos()
   },
@@ -66,13 +83,12 @@ export default ({
     get_videos: function () {
       axios.get(process.env.VUE_APP_severURL + '/getAllVideos')
         .then(res => {
-          console.log(res.data.data)
-          this.promoList = res.data.data
-          this.promoList.reverse()
+          this.promoList = res.data.video_items
+          console.log(this.promoList)
         })
     },
     to_play_video: function (event) {
-      console.log('src/views/main/index2.vue 开始播放视频')
+      console.log('src/views/main/index2.vue 开始播放视频',event)
       let param = new URLSearchParams()
       param.append('videoId', event)
       param.append('user_id', store.state.user.user_info.id)
@@ -109,12 +125,12 @@ export default ({
       }
 
       return 0;
-    }
+    },
   }
 })
 </script>
 
-<style>
+<style scoped>
 .el-carousel__item h3 {
   color: #475669;
   font-size: 14px;
@@ -130,27 +146,51 @@ export default ({
 .el-carousel__item:nth-child(2n+1) {
   background-color: #d3dce6;
 }
-
-/*li {*/
-/*  float: left;*/
-/*  display: inline-block;*/
-/*  !*background-color: #0a76a4;*!*/
-/*  !*width: 25%;*!*/
-/*}*/
-
-.time {
-  font-size: 13px;
-  color: #999;
+.el-card__body{
+  height: 250px; 
+  width: 280px;
+  display: flex;
+  flex-direction: column;
 }
-
 .bottom {
-  margin-top: 13px;
-  line-height: 20px;
+  display:flex;
+  flex-direction:row;
+  align-items: center;
+  line-height: 13px;
+  padding-top:10px;
 }
-
-.button {
-  padding: 0;
-  float: right;
+.bottom > img {
+  max-height:20px;
+}
+.bottom > p {
+  font-size:13px;
+  color: #999;
+  padding-right: 10px;
+  margin-block-start: 0em;
+  margin-block-end: 0em;
+}
+.function{
+  padding-top:10px;
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+}
+.function > p{
+  font-size:13px;
+  color: #999;
+  margin-block-start: 0em;
+  margin-block-end: 0em;
+}
+.function_items{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.funcImg{
+  max-height:16px;
+}
+.el-tooltip__popper {
+  padding:5px !important;
 }
 
 .image {

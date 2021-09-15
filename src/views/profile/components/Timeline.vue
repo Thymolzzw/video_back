@@ -8,20 +8,20 @@
       <el-button style="margin-left: 10px" type="danger" icon="el-icon-delete" circle @click="doDelete()"></el-button>
       <div style="margin: 15px 0;"></div>
       <el-checkbox-group v-model="checkedCities" @change="handleCheckedCitiesChange">
-      <el-timeline>
-        <el-timeline-item v-for="(item,index) of timeline" :key="index" :timestamp="item.time" placement="top">
-          <el-card style="height: auto; width: 300px" :body-style="{ padding: '2px' }" shadow="hover" @click.native="to_play_video(item.video_object[0].pk)">
-            <img style="height: auto; width: 100%" :src="item.video_object[0].fields.snapshoot_img" class="image">
-            <div style="padding: 14px;">
-              <span>{{ item.video_object[0].fields.title }}</span>
-              <div class="bottom clearfix">
-                <time class="time">{{ item.video_object[0].fields.create_time }}</time>
+        <el-timeline>
+          <el-timeline-item v-for="(item,index) of timeline" :key="index" :timestamp="item.time" placement="top">
+            <el-card style="height: auto; width: 300px" :body-style="{ padding: '2px' }" shadow="hover" @click.native="to_play_video(item.video_object[0].pk)">
+              <img style="height: auto; width: 100%" :src="item.video_object[0].fields.snapshoot_img" class="image">
+              <div style="padding: 14px;">
+                <span>{{ item.video_object[0].fields.title }}</span>
+                <div class="bottom clearfix">
+                  <time class="time">{{ item.video_object[0].fields.create_time }}</time>
+                </div>
               </div>
-            </div>
-          </el-card>
-          <el-checkbox :label="item.id">删除</el-checkbox>
-        </el-timeline-item>
-      </el-timeline>
+            </el-card>
+            <el-checkbox :label="item.id">删除</el-checkbox>
+          </el-timeline-item>
+        </el-timeline>
       </el-checkbox-group>
     </div>
   </div>
@@ -45,6 +45,7 @@ export default {
   },
   mounted() {
     // alert(store.state.user.user_info.id)
+    console.log('src/views/profile/Timeline.vue')
     this.getLikes()
   },
   methods: {

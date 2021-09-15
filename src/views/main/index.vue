@@ -114,6 +114,7 @@ export default {
     vm = this;
   },
   mounted() {
+    console.log('src/views/main/index.vue')
     this.mywindow.myfunction()
   },
   methods: {

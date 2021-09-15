@@ -6,20 +6,20 @@
       inactive-text="按视频搜索">
     </el-switch>
     <div id="select_list_user" v-if="isUser" style="margin-left: 15px">
-      <el-select v-model="value" filterable placeholder="请选择">
+      <el-select v-model="valueUserID" filterable placeholder="请选择">
         <el-option
           v-for="(item, index) in userList"
           :key="index"
           :label="item.fields.account_name"
           :value="item.pk">
           <span style="float: left">{{ item.fields.account_name }}</span>
-          <span style="float: right; color: #8492a6; font-size: 13px">{{ item.pk }}</span>
+          <span style="float: right; color: #8492a6; font-size: 13px">{{ item.id }}</span>
         </el-option>
       </el-select>
       <el-button type="primary" @click="doSearchWithUserID()">搜索</el-button>
     </div>
     <div id="select_list_video" v-if="isUser === false" style="margin-left: 15px">
-      <el-select v-model="value" filterable placeholder="请选择">
+      <el-select v-model="valueVideoID" filterable placeholder="请选择">
         <el-option
           v-for="(item, index) in videos"
           :key="index"
@@ -86,7 +86,8 @@ export default {
   name: "comment",
   data(){
     return {
-      value: '',
+      valueUserID: '',
+      valueVideoID:'',
       isUser: true,
       tableData: [],
       userList: [],
@@ -94,19 +95,20 @@ export default {
     }
   },
   mounted() {
+    console.log('src/views/manage/comment.vue')
     this.initComment()
   },
   methods: {
     get_videos: function () {
       axios.get(process.env.VUE_APP_severURL + '/getAllVideos')
         .then(res => {
-          var promoList = res.data.data
+          var promoList = res.data.video_items
           let len = promoList.length
           let temp = {}
           for (let i = 0; i < len; ++i){
             temp = {
-              value: promoList[i].pk,
-              label: promoList[i].fields.title
+              value: promoList[i].id,
+              label: promoList[i].title
             }
             this.videos.push(temp)
           }
@@ -114,7 +116,7 @@ export default {
     },
     doSearchWithUserID(){
       let param = new URLSearchParams()
-      param.append('user_id', this.value)
+      param.append('user_id', this.valueUserID)
       axios({
         method: 'get',
         url: process.env.VUE_APP_severURL + '/getCommentWithUserIDForAdmin',
@@ -133,8 +135,7 @@ export default {
     },
     doSearchWithVideoID(){
       let param = new URLSearchParams()
-      param.append('videoId', this.value)
-      console.log(this.value)
+      param.append('videoId', this.valueVideoID)
       axios({
         method: 'get',
         url: process.env.VUE_APP_severURL + '/getCommentWithVideoIDForAdmin',
@@ -194,7 +195,6 @@ export default {
         if (resp.data.code === 20000){
           // 用户列表
           this.userList = resp.data.data
-
         }
       })
 
@@ -205,5 +205,7 @@ export default {
 </script>
 
 <style scoped>
-
+.el-button{
+  margin-left: 10px;
+}
 </style>

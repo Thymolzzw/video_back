@@ -58,6 +58,7 @@ export default {
     ])
   },
   created() {
+    console.log('src/views/profile/index.vue')
     this.getUser()
   },
   methods: {
@@ -69,6 +70,8 @@ export default {
         avatar: this.avatar,
         user_info: this.user_info,
       }
+
+      
     }
   }
 }
