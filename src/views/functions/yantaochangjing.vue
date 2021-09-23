@@ -5,7 +5,9 @@
         <el-card style="height: 250px; width: 280px" :body-style="{ padding: '2px' }" shadow="hover" @click.native="to_play_video(item1.id)">
           <img style="height: 150px; border-radius:8px" :src="item1.snapshoot_img" class="image">
           <div style="padding: 14px;">
-            <span>{{ item1.title }}</span>
+            <el-tooltip effect='light' placement='bottom' :content='item1.title'>
+              <span style="white-space:nowrap">{{ item1.title }}</span>
+            </el-tooltip>
             <div class="bottom clearfix">
               <img src='@/assets/video.png' alt=''>
               <p>{{item1.video_time}}</p>
