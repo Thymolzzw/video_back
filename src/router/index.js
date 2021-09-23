@@ -86,6 +86,18 @@ export const constantRoutes = [
     ]
   },
   {
+    path:'/columnVideo',
+    component: Layout,
+    children: [
+      {
+        path: 'columnVideo',
+        component: () => import('@/views/columnVideo/columnmain'),
+        name: '专栏视频',
+        meta: {title:'专栏视频', icon: 'guide'}
+      }
+    ]
+  },
+  {
     path: '/video_classification',
     component: Layout,
     name: 'video_classification',

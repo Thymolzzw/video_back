@@ -79,6 +79,20 @@ export default {
         }
       })
     },
+    searchVideosByTitle(data){
+      console.log('搜索视频', data)
+      let param = new FormData()
+      param.append('key', data)
+      param.append('sourceID', '0')
+      axios({
+        method: 'post',
+        url: process.env.VUE_APP_severURL + '/searchHomeVideos',
+        contentType: 'application/x-www-form-urlencoded',
+        data: param,
+      }).then(resp => {
+        this.promoList = resp.data.video_items
+      })
+    }
   }
 }
 </script>

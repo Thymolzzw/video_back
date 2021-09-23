@@ -33,7 +33,7 @@
     <br style="clear: both;">
 
     <el-tabs type="border-card" id="videoTab" style="width: 100%">
-      <el-tab-pane label="视频信息">xxxxx</el-tab-pane>
+      <el-tab-pane label="视频信息"></el-tab-pane>
       <el-tab-pane label="目标检测">
         <el-button type="primary" v-on:click="downloadPdf('mubiao')">导出pdf</el-button>
         <div ref="mubiao">

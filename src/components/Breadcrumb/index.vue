@@ -25,6 +25,12 @@ export default {
         return
       }
       this.getBreadcrumb()
+      var flag = true
+      var content = this.levelList[1].meta.title
+      if(content == '视频搜索' || content == "视频上传" || content == "系统管理"){
+        flag = false
+      }
+      this.$emit('clickNav',flag)
     }
   },
   created() {

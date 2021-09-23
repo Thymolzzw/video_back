@@ -1,15 +1,12 @@
 <template>
   <div id="video_info">
-
     <div id="select_list">
       <el-select v-model="video_value" filterable placeholder="请选择">
         <el-option
           v-for="(item, index) in videos"
           :key="index"
           :label="item.label"
-          :value="index">
-          <span style="float: left">{{ item.label }}</span>
-          <span style="float: right; color: #8492a6; font-size: 13px">{{ item.value }}</span>
+          :value="item.value">
         </el-option>
       </el-select>
       <el-button type="primary" @click="get_subtitle(video_value)">加载</el-button>
@@ -31,11 +28,7 @@
         <hr>
         <hr>
       </div>
-
     </div>
-
-
-
   </div>
 </template>
 
@@ -111,49 +104,50 @@ export default {
       })
     },
     update_subtitle:function() {
-      let param = new FormData()
-      param.append('videoId', this.video_id)
-      param.append('sub_obj', JSON.stringify(this.sub_obj))
+      if(this.video_id != ''){
+        let param = new FormData()
+        param.append('videoId', this.video_id)
+        param.append('sub_obj', JSON.stringify(this.sub_obj))
+        axios({
+          method: 'post',
+          url: process.env.VUE_APP_severURL + '/updateSubTitle',
+          contentType: 'application/x-www-form-urlencoded',
+          data: param,
 
-      axios({
-        method: 'post',
-        url: process.env.VUE_APP_severURL + '/updateSubTitle',
-        contentType: 'application/x-www-form-urlencoded',
-        data: param,
-
-      }).then(resp => {
+        }).then(resp => {
           if(resp.data.code === 20000)
             this.$alert('修改成功', '修改结果', {
               confirmButtonText: '确定',
             });
         })
+      }
     },
 
     get_subtitle: function(s) {
-      this.video_id = this.promoList[s].id
-      let param = new URLSearchParams()
-      param.append('videoId', this.video_id)
-      axios({
-        method: 'get',
-        url: process.env.VUE_APP_severURL + '/getSubTitleForUpdate',
-        contentType: 'application/x-www-form-urlencoded',
-        params: param,
-      })
-        .then(resp => {
+      if(s == ''){
+        alert('请选择加载的数据！')
+      }
+      else{
+        this.video_id = s
+        let param = new URLSearchParams()
+        param.append('videoId', this.video_id)
+        axios({
+          method: 'get',
+          url: process.env.VUE_APP_severURL + '/getSubTitleForUpdate',
+          contentType: 'application/x-www-form-urlencoded',
+          params: param,
+        }).then(resp => {
           // var subTitle = JSON.stringify(resp.data.subTitle)
           this.sub_obj = resp.data.subTitle
-
           for (var i = 0; i < this.sub_obj.length; i++) {
             this.textarea1 += this.sub_obj[i].time
             this.textarea1 += this.sub_obj[i].content
             this.textarea1 += ' \n'
             this.subtitle_time_list.push(JSON.stringify(this.sub_obj[i].time))
             this.subtitle_list.push(this.sub_obj[i].content)
-            // alert(this.sub_obj[i].content)
           }
-          this.video_id = this.promoList[this.video_value].id
-
         })
+      }
     },
     get_videos: function () {
       axios.get(process.env.VUE_APP_severURL + '/getAllVideos')
@@ -163,12 +157,11 @@ export default {
           let temp = {}
           for (let i = 0; i < len; ++i){
             temp = {
-              value: '',
+              value: this.promoList[i].id,
               label: this.promoList[i].title
             }
             this.videos.push(temp)
           }
-          console.log()
         })
     },
   }

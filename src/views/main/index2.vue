@@ -1,6 +1,6 @@
 <template>
   <div id="main">
-    <el-carousel :interval="4000"  height="320px">
+    <el-carousel :interval="4000"  height="280px">
       <el-carousel-item v-for="(item, index) in banners" :key="index">
         <div v-on:click="aaa(item.fields.video_id)" style="width: 100%; height: 100%">
           <!--          <h3 class="medium">{{ item }}</h3>-->
@@ -84,7 +84,7 @@ export default ({
       axios.get(process.env.VUE_APP_severURL + '/getAllVideos')
         .then(res => {
           this.promoList = res.data.video_items
-          console.log(this.promoList)
+          // console.log(this.promoList)
         })
     },
     to_play_video: function (event) {
@@ -126,6 +126,20 @@ export default ({
 
       return 0;
     },
+    searchVideosByTitle(data){
+      console.log('搜索视频', data)
+      let param = new FormData()
+      param.append('key', data)
+      param.append('sourceID', '0')
+      axios({
+        method: 'post',
+        url: process.env.VUE_APP_severURL + '/searchHomeVideos',
+        contentType: 'application/x-www-form-urlencoded',
+        data: param,
+      }).then(resp => {
+        this.promoList = resp.data.video_items
+      })
+    }
   }
 })
 </script>

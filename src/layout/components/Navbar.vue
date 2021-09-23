@@ -1,22 +1,19 @@
 <template>
   <div class="navbar">
     <hamburger id="hamburger-container" :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
-
-    <breadcrumb id="breadcrumb-container" class="breadcrumb-container" />
+    <breadcrumb id="breadcrumb-container" class="breadcrumb-container" @clickNav="getBreadcrumbData"/>
 
     <div class="right-menu">
       <template v-if="device!=='mobile'">
-<!--        <search id="header-search" class="right-menu-item" />-->
-<!--        <el-input-->
-<!--          placeholder="请输入内容"-->
-<!--          v-model="input"-->
-<!--          clearable-->
-<!--          style="padding-left: 1px;"-->
-<!--          class="right-menu-search"-->
-<!--          id="header-search"-->
-<!--        >-->
-<!--        </el-input>-->
-
+        <el-input placeholder="输入查找内容"  
+          v-model="input"
+          clearable
+          suffix-icon="el-icon-search"
+          class='right-menu-search'
+          v-show="isShowSearch"
+          @keyup.enter.native="doSearch"
+          ></el-input>
+        
         <error-log class="errLog-container right-menu-item hover-effect" />
 
         <screenfull id="screenfull" class="right-menu-item hover-effect" />
@@ -68,7 +65,8 @@ export default {
   },
   data(){
     return{
-      input: ''
+      input: '',
+      isShowSearch:true,
     }
   },
   computed: {
@@ -86,6 +84,12 @@ export default {
     async logout() {
       await this.$store.dispatch('user/logout')
       this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+    },
+    getBreadcrumbData(data){
+      this.isShowSearch = data //控制搜索框的显示
+    },
+    doSearch(){
+      this.$emit('searchContent',this.input)
     }
   }
 }
@@ -122,6 +126,8 @@ export default {
   }
 
   .right-menu {
+    display:flex;
+    flex-direction:row;
     float: right;
     height: 100%;
     line-height: 50px;
@@ -171,10 +177,11 @@ export default {
         }
       }
     }
-
-    .right-menu-search{
-      align-items: center;
-    }
   }
+}
+
+.right-menu-search{
+  width: 300px;
+  margin-right: 10px;
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div id="videoPlayer" style="width: 100%;">
+  <div id="videoPlayer" class='videoPlayerMain' style="width: 100%;">
     <el-dialog style="height: 500px;" title="视频信息加载中" :visible.sync="dialogInfoVisible">
       <el-table
         style="width: 100%"
@@ -7,296 +7,44 @@
         element-loading-text="拼命加载中"
         element-loading-spinner="el-icon-loading">
       </el-table>
-
     </el-dialog>
-    <div id="player_all" style="text-align:center; width: 90%; margin-left: 50px;">
-      <div style="width: 55%;display: inline-block;vertical-align:top; margin-top: 0px;background-color: #ffffff">
 
-        <div id="player" style="width: 100%;float: left">
-          <video-player class="video-player vjs-custom-skin"
-                        ref="videoPlayer"
-                        :playsinline="true"
-                        :options="playerOptions"
-                        @play="onPlayerPlay($event)"
-                        @pause="onPlayerPause($event)"
-                        @statechanged="playerStateChanged($event)"
-                        @loadeddata="onPlayerLoadeddata($event)"
-                        @timeupdate="onPlayerTimeupdate($event)"
-                        @ready="playerReadied"
-          >
-            <track style="width: 200px;" kind="captions" :src="subtitle" srclang="en" label="English"/>
-          </video-player>
-        </div>
+    <div class="player_all">
+      <div class="player_item1">
+        <video-player class="playerDiv vjs-custom-skin"
+                      ref="videoPlayer"
+                      :playsinline="true"
+                      :options="playerOptions"
+                      @play="onPlayerPlay($event)"
+                      @pause="onPlayerPause($event)"
+                      @statechanged="playerStateChanged($event)"
+                      @loadeddata="onPlayerLoadeddata($event)"
+                      @timeupdate="onPlayerTimeupdate($event)"
+                      @ready="playerReadied"
+        >
+          <track style="width: 200px;" kind="captions" :src="subtitle" srclang="en" label="English"/>
+        </video-player>
 
-        <div id="likes">
+        <div class="likes">
           <el-button size="small" type="primary" :icon="like_state" @click="add_likes" circle></el-button>
           <el-button size="small" type="primary" icon="el-icon-share" circle @click="share_video"></el-button>
           <el-button size="small" type="primary" icon="el-icon-s-comment" circle @click="open_comment"></el-button>
         </div>
-
       </div>
-      <div style="width: 40%;display: inline-block;vertical-align:top; margin-top: 2%; margin-left: 3%;background-color: #ffffff">
-        <div id="videoTags" style="width: 100%; margin-top: 22px;">
-          <el-row style="margin-top: 20px;">
-            <el-col :span="4">
-              <el-tag type="info">视频分类</el-tag>
-            </el-col>
-            <el-col v-for="(item, index) in video_tags" :key="index" :span="3">
-              <el-tag effect="dark">{{item}}</el-tag>
-            </el-col>
-          </el-row>
 
-          <el-row style="margin-top: 20px;">
-            <el-col :span="4">
-              <el-tag type="info">视频标签</el-tag>
-            </el-col>
-            <el-col v-for="(item, index) in addition_data.video_tag" :key="index" :span="3">
-              <el-tag effect="dark">{{item}}</el-tag>
-            </el-col>
-          </el-row>
-
-          <el-row style="margin-top: 20px;">
-            <el-col :span="4">
-              <el-tag type="info">已进行的处理</el-tag>
-            </el-col>
-            <el-col style="margin-right: 5px;" v-for="(item, index) in video_functions" :key="index" :span="3.5">
-              <el-tag effect="dark">{{item}}</el-tag>
-            </el-col>
-          </el-row>
-
-          <el-row style="margin-top: 20px;">
-            <el-col :span="4">
-              <el-tag type="info">视频来源</el-tag>
-            </el-col>
-            <el-col :span="3">
-              <el-tooltip class="item" effect="dark" :content="addition_data.source_intro" placement="bottom">
-                <el-tag type="danger" @click="to_source()" >{{addition_data.source_name}}</el-tag>
-              </el-tooltip>
-            </el-col>
-          </el-row>
-
-          <div>
-            <h4 style="text-align: left">请选择要导出的产品：</h4>
-            <div id="functions_group">
-              <el-checkbox-group v-model="function_checkList" :max="1">
-
-                <el-checkbox label="6" :disabled=disable[3]>研讨视频报告</el-checkbox>
-                <el-checkbox label="7" :disabled=disable[2]>PPT画面转PDF文件</el-checkbox>
-                <el-checkbox label="8" :checked="surface_product">平面产品</el-checkbox>
-              </el-checkbox-group>
-<!--              <h4 style="display: inline-block">请选择平面产品打印份数</h4>-->
-<!--              <el-input-number  :min="0" :max="20" size="mini" v-model="surface_product_num"></el-input-number>-->
-            </div>
-            <el-button style="width: 100%; margin-top: 20px" type="primary" @click="export_product()">导出产品</el-button>
+      <div class="player_item2">
+        <div class='topDiv'>
+          <div id="word" ref="zimu" class='subTitleDiv' v-for="(item, index) in textarea1" :key="index + item.time">
+            <span>{{item.time}}</span>
+            <el-input class='englishText' type="input" v-model="item.content[0]"></el-input>
+            <el-input class='chineseText' type="input" v-model="item.content[1]"></el-input>
           </div>
         </div>
+        <div class='bottomDiv'>
+          <el-button type="primary" @click="saveData">保存修改</el-button>
+          <el-button style="margin-left: 0px;" type="primary" v-on:click="exportRaw('template.txt',textarea1)">导出TXT文本</el-button>
+        </div>
       </div>
-
-      <div style="width: 100%; display: block;vertical-align:top; margin-left: 4%;margin-top: 5px;">
-        <el-tabs :stretch="true" id="videoTabs" style="width: 100%" @tab-click="handleClick">
-          <el-tab-pane style="text-align: left; font-size: larger" label="视频信息">
-            <h4 style="display: inline">视频标题：</h4>{{video_title}}
-            <p><h4 style="display: inline">视频来源：</h4>{{addition_data.source_name}}
-            <p><h4 style="display: inline">来源简介：</h4>{{addition_data.source_intro}}
-            <p><h4 style="display: inline">视频时长：</h4>{{video_all_time}}
-            <p><h4 style="display: inline">文件大小：</h4>{{addition_data.video_file_size}}
-            <p><h4 style="display: inline">视频帧率：</h4>{{addition_data.video_fps}} fps
-            <p><h4 style="display: inline">分辨率：</h4>{{addition_data.video_frame_width}} x {{addition_data.video_frame_height}}
-            <p><h4 style="display: inline">视频比例：</h4>{{addition_data.video_frame_proportion}}
-          </el-tab-pane>
-
-          <el-tab-pane v-if="done_functions.object_detection" label="目标检测"
-                       v-loading="mubuai_loading"
-                       element-loading-text="拼命加载中"
-                       element-loading-spinner="el-icon-loading"
-                       element-loading-background="rgba(0, 0, 0, 0.8)"
-          >
-            <div style="max-height: 800px; overflow: auto">
-              <el-timeline v-for="(item, index) in equipment_json_data"
-                           :key="index" lazy>
-
-                <el-timeline-item  :timestamp="'第' + item.time + '秒'" placement="top">
-                  <el-card>
-                    <div style="width: 100%; height: auto; max-height: 220px; overflow: auto; background-color: #ffffff">
-                      <div v-for="(item1, index1) in item.objects" :key="index1">
-
-                        <div style="width: 64%; display: inline-block; margin-top: 5%">
-                          <el-image style="border-radius: 5px" :preview-src-list=[item.filename] :src=item1.image></el-image>
-                        </div>
-                        <div style="width: 35.5%; display: inline-block; margin-top: 0">
-                          <div>
-                            <h5>第{{item.time}}秒</h5>
-                          </div>
-                          <div>
-                            <h4>{{item1.name}}</h4>
-                          </div>
-                        </div>
-                      </div>
-
-                    </div>
-                  </el-card>
-                </el-timeline-item>
-
-              </el-timeline>
-            </div>
-
-
-          </el-tab-pane>
-
-          <el-tab-pane v-if="done_functions.text_detection" label="文本识别" style="width: 80%; margin-left: 10%">
-            <div ref="wenben" style="max-height: 688px; overflow: auto">
-              <el-button style="margin-bottom: 10px;" type="primary" @click="get_report_path">点击下载视频报告</el-button>
-              <div style="width: 100%; height: auto; border-bottom: 2px solid" v-for="(item, index) in textarea"
-                   :key="index">
-                <div style="width: 33%;display: inline-block;">
-                  <el-image :preview-src-list=[item.image] :src=item.image></el-image>
-                </div>
-                <div style="width: 67%; display: inline-block">
-                  <div style="height: 75px; padding-top: 5px;">
-                    <h1>{{ item.time }}</h1>
-                  </div>
-                  <div style="height: auto">
-                    <h4>{{ item.content }}</h4>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </el-tab-pane>
-
-          <el-tab-pane v-if="done_functions.face_detection" label="人脸检测">
-            <div style="height: 800px; background-color: #fcfafa">
-              <div id="people_img_name">
-
-                <div style="width: 25%; display: inline-block; height: auto;">
-                  <el-card style="" shadow="hover">
-                    <el-image border-radius style="width: 100%;transform: translateY(1%);" :src="head_img">
-                      <div slot="error" class="image-slot">
-                        <h4>此人无头像数据或此视频不存在人像</h4>
-                      </div>
-                    </el-image>
-                  </el-card>
-                </div>
-                <div style="width: 75%; display: inline-block; text-align:left ">
-                  <el-tag type="info" style="margin-top: 10px">人物介绍</el-tag>
-                  <el-card style="width: 100%;"  shadow="hover">
-                    <div style="height: 200px; overflow: scroll">
-                      <h4>{{this.people_introduce}}</h4><br>
-                    </div>
-                  </el-card>
-                </div>
-
-              </div>
-
-              <el-card>
-                <div id="people_time" style="width: 100%">
-                  <el-table
-                    :data="tableData"
-                    height="220"
-                    border
-                    style="width: 100%; text-align: center">
-                    <el-table-column
-                      prop="img"
-                      label="视频帧（点击放大）"
-                      header-align="center"
-                      align="center">
-                      <template slot-scope="scope">
-                        <el-image :src="scope.row.img" :preview-src-list=[scope.row.img] alt="" style="width: 50px;height: 50px"></el-image>
-                      </template>
-                    </el-table-column>
-                    <el-table-column
-                      prop="currentTime"
-                      label="出现时间"
-                      header-align="center"
-                      align="center">
-                    </el-table-column>
-                    <el-table-column
-                      prop="acceptValue"
-                      label="相似度"
-                      header-align="center"
-                      align="center">
-                    </el-table-column>
-
-                  </el-table>
-                </div>
-              </el-card>
-
-              <div id="allPeople" >
-                <el-row style="height: 200px; overflow: scroll">
-                  <el-col style="width: auto; display: inline-block;" v-for="(item, index) in people_data" :key="index">
-                    <div @click="change_persion(index)" style="margin: 5px;">
-                      <el-card style="height: auto; width: auto;" :body-style="{ padding: '2px' }" shadow="hover">
-                        <img style="width: 125px; height: 110px; align-self: center" :src="item.head_img" class="image">
-                        <div style="height: auto; width: 125px; text-align:center; word-wrap:break-word">
-                          {{item.people_name }}
-                        </div>
-                      </el-card>
-                    </div>
-                  </el-col>
-                </el-row>
-
-              </div>
-            </div>
-          </el-tab-pane>
-
-          <el-tab-pane v-if="done_functions.face_detection" label="关系图谱">
-            <div>
-              <div style="margin-top:5px;width: calc(100% - 10px);height:calc(100vh - 340px);">
-                <SeeksRelationGraph ref="seeksRelationGraph" :options="graphOptions" :on-node-click="onNodeClick"
-                                    :on-line-click="onLineClick"/>
-              </div>
-            </div>
-          </el-tab-pane>
-
-          <el-tab-pane v-if="done_functions.subtitle" label="语音识别">
-            <div style="width: 80%; margin-left: 10%">
-              <el-button style="margin-left: 0px;" type="primary" v-on:click="exportRaw('template.txt',textarea1)">导出TXT文本</el-button>
-              <div id="word" style="width: 100%; padding-top: 20px; float: right; height: 100%" ref="zimu">
-                <el-input
-                  type="textarea"
-                  :rows="20"
-                  placeholder="此视频无语音识别结果！"
-                  v-model="textarea1"
-                  class="textarea"
-                  disabled
-                >
-                </el-input>
-              </div>
-            </div>
-          </el-tab-pane>
-
-          <el-tab-pane v-if="done_functions.ppt" label="研讨场景PPT检测">
-            <div style="width: 36%; margin-left: 32%">
-              <el-button style="margin-bottom: 10px;" type="primary" @click="get_ppt_pdf_path">点击下载PDF文件</el-button>
-              <div style=" height: 700px; max-height: 620px;overflow:auto;">
-                <div style="width: 500px; display: inline-block; float: left;"
-                     v-for="(item, index) in ppt_imgs" :key="index">
-                  <el-image fit="fill" :src="item" ></el-image>
-                </div>
-              </div>
-            </div>
-          </el-tab-pane>
-
-          <el-tab-pane v-if="done_functions.voice_print" label="声纹检测">
-            <div style="width:80%; margin-left:10%">
-              <el-button style="margin-left: 0px;" type="primary" v-on:click="exportRaw('template.txt',shengwen_text)">导出TXT文本</el-button>
-              <div id="shengwen" style="width: 100%; padding-top: 20px; float: right; height: 100%" ref="shengw">
-                <el-input
-                  type="textarea"
-                  :rows="20"
-                  placeholder="此视频无声纹识别结果！"
-                  v-model="shengwen_text"
-                  class="textarea"
-                  disabled
-                >
-                </el-input>
-              </div>
-            </div>
-          </el-tab-pane>
-
-        </el-tabs>
-      </div>
-
     </div>
     <br style="clear: both;">
 
@@ -317,6 +65,266 @@
       </div>
     </el-drawer>
 
+    <div class='videoPlayerBottom'>
+      <el-tabs :stretch="true" id="videoTabs" style="width: 100%" @tab-click="handleClick">
+        <!-- <el-tab-pane style="text-align: left; font-size: larger" label="视频信息">
+          <h4 style="display: inline">视频标题：</h4>{{video_title}}
+          <p><h4 style="display: inline">视频来源：</h4>{{addition_data.source_name}}
+          <p><h4 style="display: inline">来源简介：</h4>{{addition_data.source_intro}}
+          <p><h4 style="display: inline">视频时长：</h4>{{video_all_time}}
+          <p><h4 style="display: inline">文件大小：</h4>{{addition_data.video_file_size}}
+          <p><h4 style="display: inline">视频帧率：</h4>{{addition_data.video_fps}} fps
+          <p><h4 style="display: inline">分辨率：</h4>{{addition_data.video_frame_width}} x {{addition_data.video_frame_height}}
+          <p><h4 style="display: inline">视频比例：</h4>{{addition_data.video_frame_proportion}}
+        </el-tab-pane> -->
+        <el-tab-pane style="text-align: left; font-size: larger" label="产品信息">
+          <div id="videoTags" style="width: 100%；">
+            <el-row>
+              <el-col :span="4">
+                <el-tag type="info">视频分类</el-tag>
+              </el-col>
+              <el-col v-for="(item, index) in video_tags" :key="index" :span="3">
+                <el-tag effect="dark">{{item}}</el-tag>
+              </el-col>
+            </el-row>
+
+            <el-row style="margin-top: 20px;">
+              <el-col :span="4">
+                <el-tag type="info">视频标签</el-tag>
+              </el-col>
+              <el-col v-for="(item, index) in addition_data.video_tag" :key="index" :span="3">
+                <el-tag effect="dark">{{item}}</el-tag>
+              </el-col>
+            </el-row>
+
+            <el-row style="margin-top: 20px;">
+              <el-col :span="4">
+                <el-tag type="info">已进行的处理</el-tag>
+              </el-col>
+              <el-col style="margin-right: 5px;" v-for="(item, index) in video_functions" :key="index" :span="3.5">
+                <el-tag effect="dark">{{item}}</el-tag>
+              </el-col>
+            </el-row>
+
+            <el-row style="margin-top: 20px;">
+              <el-col :span="4">
+                <el-tag type="info">视频来源</el-tag>
+              </el-col>
+              <el-col :span="3">
+                <el-tooltip class="item" effect="dark" :content="addition_data.source_intro" placement="bottom">
+                  <el-tag type="danger" @click="to_source()" >{{addition_data.source_name}}</el-tag>
+                </el-tooltip>
+              </el-col>
+            </el-row>
+
+            <div>
+              <h4 style="text-align: left">请选择要导出的产品：</h4>
+              <div id="functions_group">
+                <el-checkbox-group v-model="function_checkList" :max="1">
+
+                  <el-checkbox label="6" :disabled=disable[3]>研讨视频报告</el-checkbox>
+                  <el-checkbox label="7" :disabled=disable[2]>PPT画面转PDF文件</el-checkbox>
+                  <el-checkbox label="8" :checked="surface_product">平面产品</el-checkbox>
+                </el-checkbox-group>
+                <!-- <h4 style="display: inline-block">请选择平面产品打印份数</h4>-->
+                <!-- <el-input-number  :min="0" :max="20" size="mini" v-model="surface_product_num"></el-input-number>-->
+              </div>
+              <el-button style="width: 30%; margin-top: 20px" type="primary" @click="export_product()">导出产品</el-button>
+            </div>
+          </div>
+        </el-tab-pane>
+
+        <el-tab-pane v-if="done_functions.object_detection" label="目标检测"
+                      v-loading="mubuai_loading"
+                      element-loading-text="拼命加载中"
+                      element-loading-spinner="el-icon-loading"
+                      element-loading-background="rgba(0, 0, 0, 0.8)"
+        >
+          <div style="max-height: 800px; overflow: auto">
+            <el-timeline v-for="(item, index) in equipment_json_data"
+                          :key="index" lazy>
+
+              <el-timeline-item  :timestamp="'第' + item.time + '秒'" placement="top">
+                <el-card>
+                  <div style="width: 100%; height: auto; max-height: 220px; overflow: auto; background-color: #ffffff">
+                    <div v-for="(item1, index1) in item.objects" :key="index1">
+
+                      <div style="width: 64%; display: inline-block; margin-top: 5%">
+                        <el-image style="border-radius: 5px" :preview-src-list=[item.filename] :src=item1.image></el-image>
+                      </div>
+                      <div style="width: 35.5%; display: inline-block; margin-top: 0">
+                        <div>
+                          <h5>第{{item.time}}秒</h5>
+                        </div>
+                        <div>
+                          <h4>{{item1.name}}</h4>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </el-card>
+              </el-timeline-item>
+
+            </el-timeline>
+          </div>
+
+
+        </el-tab-pane>
+
+        <el-tab-pane v-if="done_functions.text_detection" label="文本识别" style="width: 80%; margin-left: 10%">
+          <div ref="wenben" style="max-height: 688px; overflow: auto">
+            <el-button style="margin-bottom: 10px;" type="primary" @click="get_report_path">点击下载视频报告</el-button>
+            <div style="width: 100%; height: auto; border-bottom: 2px solid" v-for="(item, index) in textarea"
+                  :key="index">
+              <div style="width: 33%;display: inline-block;">
+                <el-image :preview-src-list=[item.image] :src=item.image></el-image>
+              </div>
+              <div style="width: 67%; display: inline-block">
+                <div style="height: 75px; padding-top: 5px;">
+                  <h1>{{ item.time }}</h1>
+                </div>
+                <div style="height: auto">
+                  <h4>{{ item.content }}</h4>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </el-tab-pane>
+
+        <el-tab-pane v-if="done_functions.face_detection" label="人脸检测">
+          <div style="height: 800px; background-color: #fcfafa">
+            <div id="people_img_name">
+
+              <div style="width: 25%; display: inline-block; height: auto;">
+                <el-card style="" shadow="hover">
+                  <el-image border-radius style="width: 100%;transform: translateY(1%);" :src="head_img">
+                    <div slot="error" class="image-slot">
+                      <h4>此人无头像数据或此视频不存在人像</h4>
+                    </div>
+                  </el-image>
+                </el-card>
+              </div>
+              <div style="width: 75%; display: inline-block; text-align:left ">
+                <el-tag type="info" style="margin-top: 10px">人物介绍</el-tag>
+                <el-card style="width: 100%;"  shadow="hover">
+                  <div style="height: 200px; overflow: scroll">
+                    <h4>{{this.people_introduce}}</h4><br>
+                  </div>
+                </el-card>
+              </div>
+
+            </div>
+
+            <el-card>
+              <div id="people_time" style="width: 100%">
+                <el-table
+                  :data="tableData"
+                  height="220"
+                  border
+                  style="width: 100%; text-align: center">
+                  <el-table-column
+                    prop="img"
+                    label="视频帧（点击放大）"
+                    header-align="center"
+                    align="center">
+                    <template slot-scope="scope">
+                      <el-image :src="scope.row.img" :preview-src-list=[scope.row.img] alt="" style="width: 50px;height: 50px"></el-image>
+                    </template>
+                  </el-table-column>
+                  <el-table-column
+                    prop="currentTime"
+                    label="出现时间"
+                    header-align="center"
+                    align="center">
+                  </el-table-column>
+                  <el-table-column
+                    prop="acceptValue"
+                    label="相似度"
+                    header-align="center"
+                    align="center">
+                  </el-table-column>
+
+                </el-table>
+              </div>
+            </el-card>
+
+            <div id="allPeople" >
+              <el-row style="height: 200px; overflow: scroll">
+                <el-col style="width: auto; display: inline-block;" v-for="(item, index) in people_data" :key="index">
+                  <div @click="change_persion(index)" style="margin: 5px;">
+                    <el-card style="height: auto; width: auto;" :body-style="{ padding: '2px' }" shadow="hover">
+                      <img style="width: 125px; height: 110px; align-self: center" :src="item.head_img" class="image">
+                      <div style="height: auto; width: 125px; text-align:center; word-wrap:break-word">
+                        {{item.people_name }}
+                      </div>
+                    </el-card>
+                  </div>
+                </el-col>
+              </el-row>
+
+            </div>
+          </div>
+        </el-tab-pane>
+
+        <el-tab-pane v-if="done_functions.face_detection" label="关系图谱">
+          <div>
+            <div style="margin-top:5px;width: calc(100% - 10px);height:calc(100vh - 340px);">
+              <SeeksRelationGraph ref="seeksRelationGraph" :options="graphOptions" :on-node-click="onNodeClick"
+                                  :on-line-click="onLineClick"/>
+            </div>
+          </div>
+        </el-tab-pane>
+
+        <!-- <el-tab-pane v-if="done_functions.subtitle" label="语音识别">
+          <div style="width: 80%; margin-left: 10%">
+            <el-button style="margin-left: 0px;" type="primary" v-on:click="exportRaw('template.txt',textarea1)">导出TXT文本</el-button>
+            <div id="word" style="width: 100%; padding-top: 20px; float: right; height: 100%" ref="zimu">
+              <el-input
+                type="textarea"
+                :rows="20"
+                placeholder="此视频无语音识别结果！"
+                v-model="textarea1"
+                class="textarea"
+                disabled
+              >
+              </el-input>
+            </div>
+          </div>
+        </el-tab-pane> -->
+
+        <el-tab-pane v-if="done_functions.ppt" label="研讨场景PPT检测">
+          <div style="width: 36%; margin-left: 32%">
+            <el-button style="margin-bottom: 10px;" type="primary" @click="get_ppt_pdf_path">点击下载PDF文件</el-button>
+            <div style=" height: 700px; max-height: 620px;overflow:auto;">
+              <div style="width: 500px; display: inline-block; float: left;"
+                    v-for="(item, index) in ppt_imgs" :key="index">
+                <el-image fit="fill" :src="item" ></el-image>
+              </div>
+            </div>
+          </div>
+        </el-tab-pane>
+
+        <el-tab-pane v-if="done_functions.voice_print" label="声纹检测">
+          <div style="width:80%; margin-left:10%">
+            <el-button style="margin-left: 0px;" type="primary" v-on:click="exportRaw('template.txt',shengwen_text)">导出TXT文本</el-button>
+            <div id="shengwen" style="width: 100%; padding-top: 20px; float: right; height: 100%" ref="shengw">
+              <el-input
+                type="textarea"
+                :rows="20"
+                placeholder="此视频无声纹识别结果！"
+                v-model="shengwen_text"
+                class="textarea"
+                disabled
+              >
+              </el-input>
+            </div>
+          </div>
+        </el-tab-pane>
+
+      </el-tabs>
+    </div>
   </div>
 </template>
 
@@ -370,7 +378,7 @@ export default {
       video_id: 0,//当前视频数据库中id
       rel_path: '',//真实mp4文件地址，非流媒体
       textarea: '',//ocr屏幕文本识别
-      textarea1: '',//字幕展示
+      textarea1: [],//字幕展示
       video_tags: ['无标签'],//视频标签
       video_functions: [],//已进行的处理（识别...
       faces: [],//所有出现的人脸（下方选择面板
@@ -454,13 +462,13 @@ export default {
   },
   mounted() {
     this.video_id = this.$route.query.video_id
-    console.log('this.init_functions()')
     console.log('src/views/VideoPlayer/copy_tencent.vue',this.video_id)
     if (this.video_id === undefined) {
       this.video_id = 1
     }
     this.dialogInfoVisible = true
     this.init_functions()
+    this.get_subtitle()
     this.get_video_data()
     this.get_addition_data()
     this.getLikeState()
@@ -481,7 +489,6 @@ export default {
         if (resp.data.code === 20000){
           this.done_functions.object_detection = resp.data.data.object_detection
           this.done_functions.voice_print = resp.data.data.voice_print
-          console.log('11111111111111111111111',this.done_functions.voice_print)
           this.done_functions.ppt = resp.data.data.ppt
           this.done_functions.subtitle = resp.data.data.subtitle
           this.done_functions.face_detection = resp.data.data.face_detection
@@ -584,9 +591,11 @@ export default {
         this.get_detect_text()
       }else if(tab.label === "人脸检测"){
         this.get_faces()
-      }else if(tab.label === "语音识别"){
-        this.get_subtitle()
-      }else if(tab.label === "研讨场景PPT检测"){
+      }
+      // else if(tab.label === "语音识别"){
+      //   this.get_subtitle()
+      // }
+      else if(tab.label === "研讨场景PPT检测"){
         this.get_ppt_imgs()
       }else if(tab.label === "声纹检测"){
         this.get_voice()
@@ -749,12 +758,12 @@ export default {
     },
     onPlayerPause(player) {
       // 监听暂停
-      console.log('copy_tencent.vue 暂停')
+      //console.log('copy_tencent.vue 暂停')
       // 暂停时时间
       this.$emit('onPlayerPauseFun', player)
     },
     onPlayerPlay(player){
-      console.log('player play!')
+      //console.log('player play!')
     },
     playerStateChanged(player){
       // console.log('player state changed!', player)
@@ -786,11 +795,38 @@ export default {
     },
     exportRaw(name, data) {
       var urlObject = window.URL || window.webkitURL || window
-      var export_blob = new Blob([data])
+      var contentEnglish = ''
+      var contentChinese = ''
+      for(var i=0; i<data.length; i++){
+        contentEnglish += data[i].content[0]
+        contentChinese += data[i].content[1]
+      }
+      contentEnglish += '\n\n'
+      contentEnglish += contentChinese
+      var export_blob = new Blob([contentEnglish])
       var save_link = document.createElementNS('http://www.w3.org/1999/xhtml', 'a')
       save_link.href = urlObject.createObjectURL(export_blob)
       save_link.download = name
       this.fakeClick(save_link)
+    },
+    saveData(){
+      if(this.textarea1 != ''){
+        let param = new FormData()
+        param.append('videoId', this.video_id)
+        param.append('sub_obj', JSON.stringify(this.textarea1))
+        axios({
+          method: 'post',
+          url: process.env.VUE_APP_severURL + '/updateSubTitle',
+          contentType: 'application/x-www-form-urlencoded',
+          data: param,
+
+        }).then(resp => {
+          if(resp.data.code === 20000)
+            this.$alert('修改成功', '修改结果', {
+              confirmButtonText: '确定',
+            });
+        })
+      }
     },
     videoUrl(val) {
       if (val !== '') {
@@ -1010,13 +1046,18 @@ export default {
         headers: config.headers
       }).then(resp => {
         if (resp.data.code === 20000){
-          this.textarea1 = ''
+          this.textarea1 = []
           var subTitle = JSON.stringify(resp.data.subTitle)
           var sub_obj = JSON.parse(subTitle)
           for (var i = 0; i < sub_obj.length; i++) {
-            this.textarea1 += sub_obj[i].time
-            this.textarea1 += sub_obj[i].content
-            this.textarea1 += ' \n'
+            var obj = {}
+            var item1 = sub_obj[i].time.split("\n")
+            obj.time = item1[0]
+            var item = sub_obj[i].content.split("\n")
+            obj.content = new Array(2)
+            obj.content[0] = item[0]
+            obj.content[1] = item[1]
+            this.textarea1.push(obj)
           }
           this.$message({
             message: '语音识别加载成功！',
@@ -1230,6 +1271,79 @@ ul li {
 <style scoped>
 /deep/ .el-tabs__item {
     font-size: 18px;
+}
+.videoPlayerMain{
+  display: flex;
+  flex-direction: column;
+}
+.player_all{
+  display: flex;
+  flex-direction: row;
+  width:100%;
+  height:500px;
+  padding-top: 10px;
+  padding-left: 10px;
+  padding-right: 5px;
+  text-align: center;
+}
+.player_item1{
+  width: 53%;
+  display: flex;
+  flex-direction: column;
+}
+.playerDiv{
+  width:100%;
+  height: 94%;
+}
+.likes{
+  margin-top: 5px;
+  flex:1;
+}
+.likes > .el-button{
+  float: left;
+  margin-right: 20px;
+}
+.player_item2{
+  flex:1;
+  margin-left: 20px;
+  display: flex;
+  flex-direction: column; 
+}
+.topDiv{
+  height: 96%;
+  overflow-y:scroll;
+}
+.subTitleDiv{
+  width:100%;
+  text-align:left;
+  margin-bottom: 14px;
+  margin-top: 5px;
+}
+.englishText >>> input{
+  border: 0px;
+  color: #09f;
+  line-height: 20px;
+  height: 25px;
+}
+.chineseText >>> input{
+  border: 0px;
+  color: #ff8c00;
+  line-height: 20px;
+  height: 25px;
+}
+.bottomDiv{
+  flex:1;
+  margin-top: 10px;
+}
+.bottomDiv > .el-button{
+  padding: 5px;
+  float: left;
+  margin-right: 20px;
+}
+.videoPlayerBottom{
+  width: 100%;
+  display: block;
+  margin-left: 10px;
 }
 </style>
 

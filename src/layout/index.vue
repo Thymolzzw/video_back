@@ -4,10 +4,10 @@
     <sidebar class="sidebar-container" />
     <div :class="{hasTagsView:needTagsView}" class="main-container">
       <div :class="{'fixed-header':fixedHeader}">
-        <navbar />
+        <navbar @searchContent = "getSearchContent" />
         <tags-view v-if="needTagsView" />
       </div>
-      <app-main />
+      <app-main ref="child"/>
       <right-panel v-if="showSettings">
         <settings />
       </right-panel>
@@ -20,6 +20,7 @@ import RightPanel from '@/components/RightPanel'
 import { AppMain, Navbar, Settings, Sidebar, TagsView } from './components'
 import ResizeMixin from './mixin/ResizeHandler'
 import { mapState } from 'vuex'
+// import { dataTool } from 'node_modules/echarts/lib/echarts'
 
 export default {
   name: 'Layout',
@@ -52,6 +53,9 @@ export default {
   methods: {
     handleClickOutside() {
       this.$store.dispatch('app/closeSideBar', { withoutAnimation: false })
+    },
+    getSearchContent(data){
+      this.$refs.child.getSearchData(data)
     }
   }
 }

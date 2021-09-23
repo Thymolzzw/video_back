@@ -60,7 +60,7 @@
         <div style="width: 35%;">
           <el-checkbox-group v-model="checkboxGroup1">
             <div style="display: inline-block" v-for="(fun, index) in functions" :label="fun" :key="fun">
-              <el-checkbox-button style="width: 100%" border :label="index" :key="index">{{index+1}} - {{fun}}</el-checkbox-button>
+              <el-checkbox-button style="width: 100%" border :label="index" :key="index" v-show="index != 4">{{index+1}} - {{fun}}</el-checkbox-button>
             </div>
           </el-checkbox-group>
         </div>
