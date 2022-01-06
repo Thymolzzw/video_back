@@ -120,6 +120,7 @@
   </div>
 </template>
 
+
 <script>
 import { validUsername } from '@/utils/validate'
 import axios from "axios";
@@ -199,6 +200,7 @@ export default {
     // window.addEventListener('storage', this.afterQRScan)
   },
   mounted() {
+    console.log('src/views/login/test_index.vue')
     if (this.loginForm.username === '') {
       this.$refs.username.focus()
     } else if (this.loginForm.password === '') {
@@ -252,9 +254,7 @@ export default {
           this.loading = true
           this.$store.dispatch('user/login', this.loginForm)
             .then(() => {
-              console.log('logintest', '122')
               this.$router.push({ path: '/' })
-              console.log('logintest', '1222')
               this.loading = false
             })
             .catch(() => {

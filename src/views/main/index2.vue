@@ -1,15 +1,14 @@
 <template>
-  <div id="main">
+  <div class="main">
     <el-carousel :interval="4000"  height="280px">
       <el-carousel-item v-for="(item, index) in banners" :key="index">
         <div v-on:click="aaa(item.fields.video_id)" style="width: 100%; height: 100%">
-          <!--          <h3 class="medium">{{ item }}</h3>-->
           <img :src="item.fields.img" style="height: 320px; width: 100%"/>
         </div>
       </el-carousel-item>
     </el-carousel>
 
-    <div id="video_list">
+    <div class="video_list" v-infinite-scroll="load" style="overflow:auto">
       <el-row>
         <el-col :span="5.5" v-for="(item1, index) in promoList" :key="index" style="padding: 10px" >
           <el-card style="height: 250px; width: 280px" :body-style="{ padding: '2px' }" shadow="hover" @click.native="to_play_video(item1.id)">
@@ -20,11 +19,11 @@
               </el-tooltip>
               <div class="bottom clearfix">
                 <img src='@/assets/video.png' alt=''>
-                <p>{{item1.video_time}}</p>
+                <p style="width: 50px;">{{item1.length}}</p>
                 <img src='@/assets/source.png' alt=''>
-                <p>{{item1.source}}</p>
+                <p style="width: 80px;">{{item1.source}}</p>
                 <img src='@/assets/clock.png' alt=''>
-                <p class="time">{{item1.create_time}}</p>
+                <p class="time" style="width: 80px;">{{item1.add_time}}</p>
               </div>
               <div class='function'>
                 <p>功能：</p>
@@ -44,7 +43,7 @@
 
 <script lang="ts">
 import axios from 'axios'
-import store from "../../store/index";
+import store from "../../store/index"
 
 export default ({
   data(){
@@ -57,7 +56,9 @@ export default ({
                      {path:require('@/assets/f4.png'),label:'自然场景文本识别'}, 
                      {path:require('@/assets/f5.png'),label:'语音识别与翻译'}, 
                      {path:require('@/assets/f6.png'),label:'声纹识别'}],
-      currentDate: new Date()
+      currentDate: new Date(),
+      pages:0,
+      page_item:15
     }
   },
   computed: {
@@ -67,8 +68,12 @@ export default ({
   },
   mounted() {
     console.log('src/views/main/index2.vue')
+    this.loginRecord()
     this.get_banners()
     this.get_videos()
+    //var os = require('os')
+    //const IP = require('../../../build/get-ip')
+    //console.log('sss',os)
   },
   methods: {
     time_2_date: function (stamp) {
@@ -78,16 +83,23 @@ export default ({
     get_banners: function () {
       axios.get(process.env.VUE_APP_severURL + '/getBinner')
         .then(res => {
-          console.log(res.data.data)
+          //console.log(res.data.data)
           this.banners = res.data.data
         })
     },
     get_videos: function () {
-      axios.get(process.env.VUE_APP_severURL + '/getAllVideos')
-        .then(res => {
-          this.promoList = res.data.video_items
-          // console.log(this.promoList)
-        })
+      let param = new FormData()
+      param.append('pages',this.pages)
+      param.append('page_item',this.page_item)
+      axios({
+        method: 'post',
+        url: process.env.VUE_APP_severURL + '/getAllVideos',
+        data: param,
+      }).then(resp=>{
+        for(var i =0;i < resp.data.video_items.length; i++){
+          this.promoList.push(resp.data.video_items[i])
+        }
+      })
     },
     to_play_video: function (event) {
       console.log('src/views/main/index2.vue 开始播放视频',event)
@@ -110,29 +122,29 @@ export default ({
             })
           }
       })
-
     },
-    aaa: function (msg) {
-      // alert(msg)
-      if (msg){
-        this.$router.push({
-          path: '/player',
-          name: '视频播放详情页',
-          query: {
-            video_id: msg
-          }
-        })
-      }else{
-        this.$message.error('该图没有指向的视频！');
-      }
-
-      return 0;
+    loginRecord(){
+      let param = new FormData()
+      param.append('userId',sessionStorage.getItem('token'))
+      var date = new Date()
+      var dateString = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() + "." + date.getMilliseconds()
+      param.append('time',dateString)
+      var ip = '0.0.0.0'
+      param.append('ip',ip)
+      axios({
+        method: 'post',
+        url: process.env.VUE_APP_severURL + '/loginRecord',
+        data: param,
+      }).then(resp=>{
+        console.log('login/test_index.vue',resp.data)
+      })
     },
     searchVideosByTitle(data){
       console.log('搜索视频', data)
       let param = new FormData()
       param.append('key', data)
       param.append('sourceID', '0')
+      param.append('function','0')
       axios({
         method: 'post',
         url: process.env.VUE_APP_severURL + '/searchHomeVideos',
@@ -141,6 +153,10 @@ export default ({
       }).then(resp => {
         this.promoList = resp.data.video_items
       })
+    },
+    load(){
+      this.pages = this.pages + 1
+      this.get_videos()
     }
   }
 })
@@ -154,7 +170,6 @@ export default ({
   line-height: 200px;
   margin: 0;
 }
-
 .el-carousel__item:nth-child(2n) {
   background-color: #99a9bf;
 }
@@ -167,6 +182,9 @@ export default ({
   width: 280px;
   display: flex;
   flex-direction: column;
+}
+.video_list{
+  height: 800px;
 }
 .bottom {
   display:flex;
@@ -181,9 +199,11 @@ export default ({
 .bottom > p {
   font-size:13px;
   color: #999;
-  padding-right: 10px;
   margin-block-start: 0em;
   margin-block-end: 0em;
+  text-overflow:ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 .function{
   padding-top:10px;

@@ -5,9 +5,9 @@
       <el-table :data="country_list"  border style="width: 100%">
         <el-table-column type="index" label="编号" :index="indexMethod" width="80">
         </el-table-column>
-        <el-table-column prop="country_name" label="视频源名称" width="180">
+        <el-table-column prop="country_name" label="视频源国家名称" width="180">
         </el-table-column>
-        <el-table-column prop="country_introduce" label="视频源介绍">
+        <el-table-column prop="country_abs" label="视频源国家简称">
         </el-table-column>
         <el-table-column prop="address" label="操作">
           <template slot-scope="scope">
@@ -26,7 +26,7 @@
         <el-form-item label="国家名称" prop="country_name">
           <el-input v-model="Form.country_name" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="国家介绍" prop="country_introduce">
+        <el-form-item label="国家介绍" prop="country_abs">
           <el-input type="textarea" v-model="Form.country_introduce"></el-input>
         </el-form-item>
       </el-form>
@@ -51,7 +51,7 @@ export default {
       Form: {
         country_id: '',
         country_name: '',
-        country_introduce: ''
+        country_abs: ''
       },
       titleMap: {
         add:'新增',
@@ -83,7 +83,7 @@ export default {
       let param = new FormData()
       param.append('country_id', this.Form.country_id)
       param.append('country_name', this.Form.country_name)
-      param.append('country_introduce', this.Form.country_introduce)
+      param.append('country_abs', this.Form.country_abs)
       param.append('dialog_status', this.dialogStatus)
       axios({
         method: 'post',
@@ -111,7 +111,7 @@ export default {
       this.dialogStatus = 'edit';
       this.Form.country_id = this.country_list[index].country_id;
       this.Form.country_name = this.country_list[index].country_name;
-      this.Form.country_introduce = this.country_list[index].country_introduce;
+      this.Form.country_abs = this.country_list[index].country_abs;
       this.FormVisible = true;
     },
     clickAddcountry: function (){

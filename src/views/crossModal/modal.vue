@@ -28,7 +28,7 @@
             <div style="padding: 14px;">
               <span>{{ item1.fields.title }}</span>
               <div class="bottom clearfix">
-                <time class="time">{{ item1.fields.create_time }}</time>
+                <time class="time">{{ item1.fields.add_time }}</time>
                 <!--                <p>{{ this.time_2_date(item1.fields.create_time) }}</p>-->
                 <!--                <router-link :to="{ name: 'readDetail', params: { msgKeyOne: 'jump test.' }}">-->
                 <!--                  <button type="button">跳转</button>-->

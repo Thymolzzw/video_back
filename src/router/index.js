@@ -231,7 +231,19 @@ export const constantRoutes = [
       }
     ]
   },
-
+  {
+    path: '/videolist',
+    component: Layout,
+    hidden: true,
+    children: [
+      {
+        path:'columnvideolist',
+        component: () => import('@/views/columnVideo/columnvideolist'),
+        name: '专栏视频列表',
+        meta: { title: '专栏视频列表', icon: 'star' }
+      }
+    ]
+  }
 ]
 
 /**

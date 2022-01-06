@@ -76,7 +76,9 @@ export default {
       top: 0;
     }
   }
-
+  .sidebar-container{
+    height: 100%;
+  }
   .drawer-bg {
     background: #000;
     opacity: 0.3;

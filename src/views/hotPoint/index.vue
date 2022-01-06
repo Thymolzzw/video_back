@@ -1,5 +1,5 @@
 <template>
-  <div id="video_list">
+  <div class="video_list" v-infinite-scroll="load" style="overflow:auto">
     <el-row>
       <el-col :span="5.5" v-for="(item1, index) in promoList" :key="index" style="padding: 10px" >
         <el-card style="height: 250px; width: 280px" :body-style="{ padding: '2px' }" shadow="hover" @click.native="to_play_video(item1.id)">
@@ -10,11 +10,11 @@
             </el-tooltip>
             <div class="bottom clearfix">
               <img src='@/assets/video.png' alt=''>
-              <p>{{item1.video_time}}</p>
+              <p style="width: 50px;">{{item1.length}}</p>
               <img src='@/assets/source.png' alt=''>
-              <p>{{item1.source}}</p>
+              <p style="width: 80px;">{{item1.source}}</p>
               <img src='@/assets/clock.png' alt=''>
-              <p class="time">{{item1.create_time}}</p>
+              <p class="time" style="width: 80px;">{{item1.create_time}}</p>
             </div>
             <div class='function'>
               <p>功能：</p>
@@ -45,6 +45,8 @@ export default {
                      {path:require('@/assets/f4.png'),label:'自然场景文本识别'}, 
                      {path:require('@/assets/f5.png'),label:'语音识别与翻译'}, 
                      {path:require('@/assets/f6.png'),label:'声纹识别'}],
+      pages:0,
+      page_item:15
     }
   },
   mounted() {
@@ -54,11 +56,18 @@ export default {
   name: 'index',
   methods: {
     get_videos: function () {
-      axios.get(process.env.VUE_APP_severURL + '/getHotVideos')
-        .then(res => {
-          this.promoList = res.data.video_items
-          console.log(this.promoList)
-        })
+      let param = new FormData()
+      param.append('pages',this.pages)
+      param.append('page_item',this.page_item)
+      axios({
+        method: 'post',
+        url: process.env.VUE_APP_severURL + '/getHotVideos',
+        data: param,
+      }).then(resp=>{
+        for(var i =0;i < resp.data.video_items.length; i++){
+          this.promoList.push(resp.data.video_items[i])
+        }
+      })
     },
     to_play_video: function (event) {
       let param = new URLSearchParams()
@@ -86,6 +95,7 @@ export default {
       let param = new FormData()
       param.append('key', data)
       param.append('sourceID', '0')
+      param.append('function', '-1')
       axios({
         method: 'post',
         url: process.env.VUE_APP_severURL + '/searchHomeVideos',
@@ -94,6 +104,10 @@ export default {
       }).then(resp => {
         this.promoList = resp.data.video_items
       })
+    },
+    load(){
+      this.pages = this.pages + 1
+      this.get_videos()
     }
   }
 }
@@ -118,9 +132,14 @@ export default {
 .bottom > p {
   font-size:13px;
   color: #999;
-  padding-right: 10px;
   margin-block-start: 0em;
   margin-block-end: 0em;
+  text-overflow:ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.video_list{
+  height: 820px;
 }
 .function{
   padding-top:10px;

@@ -219,6 +219,8 @@ export default {
 
     },
     get_addition_data: function(s) {
+      if(s==='')
+        return
       this.tableData = []
       let param = new URLSearchParams()
       param.append('videoId', this.promoList[s].id)
@@ -280,7 +282,6 @@ export default {
             }
             this.videos.push(temp)
           }
-          console.log()
         })
     },
   }

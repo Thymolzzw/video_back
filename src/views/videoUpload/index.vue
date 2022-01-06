@@ -8,11 +8,9 @@
       :close-on-click-modal="false"
       :close-on-press-escape="false"
     >
-      <span>视频正在上传至服务器，进度条变绿前请勿关闭此提示</span>
-      <el-progress :text-inside="true" :stroke-width="24" :percentage="parseFloat(load_line)" :status="line_color_1"></el-progress>
+      <span>此次操作已转入后台处理！</span>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">关  闭</el-button>
-        <!--        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>-->
+        <el-button type="primary" @click="dialogVisible = false">关  闭</el-button>
       </span>
     </el-dialog>
 
@@ -36,11 +34,8 @@
             :on-success = "handleSuccess"
             :on-error	= "()=>{loading = false}"
             :on-change= "handleFileChange"
-            :multiple = "false"
-          >
-
-            <!--:file-list="uploadFileList"-->
-            <div v-loading="loading">
+            :multiple = "false">
+            <div>
               <img
                 v-if="thumb_filename"
                 width="100%"
@@ -108,12 +103,9 @@
 
       <el-form-item>
         <el-button type="primary" @click="submitUpload">确认提交</el-button>
-<!--        <el-button type="primary" @click="ceshi">ceshi</el-button>-->
       </el-form-item>
 
     </el-form>
-
-
   </div>
 </template>
 
@@ -137,7 +129,6 @@ export default {
       queryMethod: queryVideos,
       dialogVisible: false,
       load_line: 0,
-      line_color_1:null,
       file:'',
 
       video_tag: '',
@@ -182,6 +173,7 @@ export default {
     }
   },
   mounted() {
+    console.log('/src/views/videoUpload/index.vue')
     this.get_all_source()
   },
 
@@ -261,7 +253,6 @@ export default {
     handleFileChange(file, fileList) {
       if (file.status === 'ready') {
         this.thumb_filename  = undefined
-        alert('jinru')
         this.file = file
         this.query.title = file.raw.name
       }
@@ -273,7 +264,6 @@ export default {
       //this.clearTimeout(this.timeID);
       this.dialogVisible = true
       this.load_line = 100
-      this.line_color_1 = "success"
 
       var type = ''
       this.loading = false
@@ -307,7 +297,6 @@ export default {
       if(this.video_tag === ''){
         this.video_tag = ''
       }
-      // this.line_color_1 = "primary"
       this.dialogVisible = true
       //1.上传视频
       this.loading = true

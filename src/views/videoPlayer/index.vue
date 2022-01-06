@@ -166,7 +166,6 @@ export default {
       renlian: '',
       txt_subtitle_arr: [],
       equipment_json_data: '',
-      video_time: 0,
       selectableRange: '',
       ppt_pdf_path: '',
       ppt_imgs: '',
@@ -328,15 +327,8 @@ export default {
             this.textarea1 += sub_obj[i].time
             this.textarea1 += sub_obj[i].content
           }
-
           // 获取目标检测
           this.equipment_json_data = resp.data.equipment_json_data
-          // this.video_time = this.formatSeconds(parseInt(resp.data.video_time))
-          //
-          // var str = '00:00:00 - ' + this.video_time.toString()
-          // this.selectableRange = '18:30:00 - 20:30:00'
-          // this.selectableRange.push(str)
-          // alert(this.selectableRange)
         })
     },
     get_shengwen: function() {

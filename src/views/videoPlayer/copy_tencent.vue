@@ -40,9 +40,11 @@
             <el-input class='chineseText' type="input" v-model="item.content[1]"></el-input>
           </div>
         </div>
-        <div class='bottomDiv'>
+        <div class='bottomDiv' v-if="textarea1.length!=0">
           <el-button type="primary" @click="saveData">保存修改</el-button>
-          <el-button style="margin-left: 0px;" type="primary" v-on:click="exportRaw('template.txt',textarea1)">导出TXT文本</el-button>
+          <el-button type="primary" v-on:click="exportRaw('template.txt',textarea1)">导出TXT文本</el-button>
+          <el-button type="primary" v-if="translate_state" >已 精 翻</el-button>
+          <el-button type="primary" v-if="!translate_state">机器翻译</el-button>
         </div>
       </div>
     </div>
@@ -67,19 +69,9 @@
 
     <div class='videoPlayerBottom'>
       <el-tabs :stretch="true" id="videoTabs" style="width: 100%" @tab-click="handleClick">
-        <!-- <el-tab-pane style="text-align: left; font-size: larger" label="视频信息">
-          <h4 style="display: inline">视频标题：</h4>{{video_title}}
-          <p><h4 style="display: inline">视频来源：</h4>{{addition_data.source_name}}
-          <p><h4 style="display: inline">来源简介：</h4>{{addition_data.source_intro}}
-          <p><h4 style="display: inline">视频时长：</h4>{{video_all_time}}
-          <p><h4 style="display: inline">文件大小：</h4>{{addition_data.video_file_size}}
-          <p><h4 style="display: inline">视频帧率：</h4>{{addition_data.video_fps}} fps
-          <p><h4 style="display: inline">分辨率：</h4>{{addition_data.video_frame_width}} x {{addition_data.video_frame_height}}
-          <p><h4 style="display: inline">视频比例：</h4>{{addition_data.video_frame_proportion}}
-        </el-tab-pane> -->
         <el-tab-pane style="text-align: left; font-size: larger" label="产品信息">
           <div id="videoTags" style="width: 100%；">
-            <el-row>
+            <!-- <el-row>
               <el-col :span="4">
                 <el-tag type="info">视频分类</el-tag>
               </el-col>
@@ -97,14 +89,6 @@
               </el-col>
             </el-row>
 
-            <el-row style="margin-top: 20px;">
-              <el-col :span="4">
-                <el-tag type="info">已进行的处理</el-tag>
-              </el-col>
-              <el-col style="margin-right: 5px;" v-for="(item, index) in video_functions" :key="index" :span="3.5">
-                <el-tag effect="dark">{{item}}</el-tag>
-              </el-col>
-            </el-row>
 
             <el-row style="margin-top: 20px;">
               <el-col :span="4">
@@ -115,9 +99,18 @@
                   <el-tag type="danger" @click="to_source()" >{{addition_data.source_name}}</el-tag>
                 </el-tooltip>
               </el-col>
-            </el-row>
-
-            <div>
+            </el-row> -->
+            <div class='videoTagsTop'>
+              <h4 style="display: inline">视频标题：</h4>{{video_title}}
+              <p><h4 style="display: inline">视频来源：</h4>{{addition_data.source_name}}
+              <p><h4 style="display: inline">来源简介：</h4>{{addition_data.source_intro}}
+              <p><h4 style="display: inline">视频时长：</h4>{{addition_data.video_length}}
+              <p><h4 style="display: inline">文件大小：</h4>{{addition_data.video_file_size}}
+              <p><h4 style="display: inline">视频帧率：</h4>{{addition_data.video_fps}} fps
+              <!-- <p><h4 style="display: inline">分辨率：</h4>{{addition_data.video_frame_width}} x {{addition_data.video_frame_height}} -->
+              <!-- <p><h4 style="display: inline">视频比例：</h4>{{addition_data.video_frame_proportion}} -->
+            </div>
+            <div class='videoTagsBottom'>
               <h4 style="text-align: left">请选择要导出的产品：</h4>
               <div id="functions_group">
                 <el-checkbox-group v-model="function_checkList" :max="1">
@@ -277,23 +270,6 @@
           </div>
         </el-tab-pane>
 
-        <!-- <el-tab-pane v-if="done_functions.subtitle" label="语音识别">
-          <div style="width: 80%; margin-left: 10%">
-            <el-button style="margin-left: 0px;" type="primary" v-on:click="exportRaw('template.txt',textarea1)">导出TXT文本</el-button>
-            <div id="word" style="width: 100%; padding-top: 20px; float: right; height: 100%" ref="zimu">
-              <el-input
-                type="textarea"
-                :rows="20"
-                placeholder="此视频无语音识别结果！"
-                v-model="textarea1"
-                class="textarea"
-                disabled
-              >
-              </el-input>
-            </div>
-          </div>
-        </el-tab-pane> -->
-
         <el-tab-pane v-if="done_functions.ppt" label="研讨场景PPT检测">
           <div style="width: 36%; margin-left: 32%">
             <el-button style="margin-bottom: 10px;" type="primary" @click="get_ppt_pdf_path">点击下载PDF文件</el-button>
@@ -392,7 +368,7 @@ export default {
 
       equipment_json_data: '',
       equipment_json_data_time:[],
-      video_all_time: '',
+      //video_all_time: '',
       selectableRange: '',
       ppt_pdf_path: '',
       ppt_imgs: '',
@@ -458,6 +434,12 @@ export default {
           avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif'
         },
       },
+      translate_state:false,
+      ocr_state:false,
+      voice_state:false,
+      ppt_state:false,
+      equipment_state:false,
+      face_state:false,
     }
   },
   mounted() {
@@ -485,7 +467,6 @@ export default {
         contentType: 'application/x-www-form-urlencoded',
         data: param,
       }).then(resp => {
-        console.log('videoPlayer/copy_tencent.vue init_functions()', resp.data.data)
         if (resp.data.code === 20000){
           this.done_functions.object_detection = resp.data.data.object_detection
           this.done_functions.voice_print = resp.data.data.voice_print
@@ -493,6 +474,24 @@ export default {
           this.done_functions.subtitle = resp.data.data.subtitle
           this.done_functions.face_detection = resp.data.data.face_detection
           this.done_functions.text_detection = resp.data.data.text_detection
+          if(resp.data.data.translate_state == '1'){
+            this.translate_state = true
+          }
+          if(resp.data.data.ocr_state == '1'){
+            this.ocr_state = true
+          }
+          if(resp.data.data.voice_state == '1'){
+            this.voice_state = true
+          }
+          if(resp.data.data.ppt_state == '1'){
+            this.ppt_state = true
+          }
+          if(resp.data.data.equipment_state == '1'){
+            this.equipment_state = true
+          }
+          if(resp.data.data.face_state == '1'){
+            this.face_state = true
+          }
           this.$message({
             message: '加载成功！',
             type: 'success'
@@ -825,6 +824,7 @@ export default {
             this.$alert('修改成功', '修改结果', {
               confirmButtonText: '确定',
             });
+            this.translate_state = true
         })
       }
     },
@@ -1023,7 +1023,7 @@ export default {
       })
         .then(resp => {
           this.addition_data = resp.data.addition_data
-          this.video_all_time = formatSeconds(JSON.stringify(this.addition_data.video_time))
+          //this.video_all_time = formatSeconds(JSON.stringify(this.addition_data.video_length))
           this.fun_list = resp.data.functions
           for(let i = 0; i < this.fun_list.length; ++i){
             this.video_functions.push(this.all_functions[this.fun_list[i]])
@@ -1311,7 +1311,7 @@ ul li {
 }
 .topDiv{
   height: 96%;
-  overflow-y:scroll;
+  overflow-y:auto;
 }
 .subTitleDiv{
   width:100%;
@@ -1344,6 +1344,17 @@ ul li {
   width: 100%;
   display: block;
   margin-left: 10px;
+}
+#videoTags{
+  display:flex;
+  flex-direction:row;
+}
+.videoTagsTop{
+  width:50%;
+}
+.videoTagsBottom{
+  padding-left: 5%;
+  width:50%;
 }
 </style>
 

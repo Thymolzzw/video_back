@@ -1,45 +1,24 @@
 <template>
   <div class='columnMain'>
-    <div class='columnlist'>
-      <div class='columntitle'>
-        <img class='img1' src='@/assets/column.png' alt=''>
-        <p class='p1'>专栏</p>
-        <p class='p2'>|</p>
-      </div>
-      <div class='columncontent' id="columncontent">
-        <p v-for="(item, index) in columnlist" :key='index'>{{item.resource_name}}</p>
-      </div>
+    <el-input placeholder='输入查找的专栏名' 
+      v-model='inputContent' 
+      clearable
+      suffix-icon="el-icon-search"
+      class='right-menu-search'
+      @keyup.enter.native="doSearchColumn">
+    </el-input>
+    <div class='letterDiv' id='letterDiv'>
+      <p v-for='(item,index) in letterlist' :key='index'>{{item}}</p>
     </div>
-    <div class='videolist'>
-      <el-row>
-        <el-col :span="5.5" v-for="(item1, index) in videolist" :key="index" style="padding: 10px" >
-          <el-card style="height: 250px; width: 280px" :body-style="{ padding: '2px' }" shadow="hover" @click.native="to_play_video(item1.id)">
-            <img style="height:150px;border-radius:8px;" :src="item1.snapshoot_img" class="image">
-            <div style="padding: 14px;">
-              <el-tooltip effect='light' placement='bottom' :content='item1.title'>
-                <span style="white-space:nowrap">{{ item1.title }}</span>
-              </el-tooltip>
-              <div class="bottom clearfix">
-                <img src='@/assets/video.png' alt=''>
-                <p>{{item1.video_time}}</p>
-                <img src='@/assets/source.png' alt=''>
-                <p>{{item1.source}}</p>
-                <img src='@/assets/clock.png' alt=''>
-                <p class="time">{{item1.create_time}}</p>
-              </div>
-              <div class='function'>
-                <p>功能：</p>
-                <div class='function_items' v-for='(item,index) in item1.functions' :key="index">
-                  <el-tooltip class='item' effect="dark" :content="function_imgs[item].label" placement="right">
-                    <img class='funcImg' :src='function_imgs[item].path' alt=''>
-                  </el-tooltip>
-                </div>
-              </div>
-            </div>
-          </el-card>
-        </el-col>
-      </el-row>
-    </div>
+    <ul id='item-list'>
+      <li class='item-text' v-for='(item,index) in columnlist' :key='index'>
+        <a class='item-link'>
+          <span>{{item.resource_name}}</span>
+          <span class='item-count'>{{item.videoCount}}</span>
+          <p v-show='false'>{{item.resource_id}}</p>
+        </a>
+      </li>
+    </ul>
   </div>
 </template>
 
@@ -49,20 +28,17 @@ export default {
   data(){
     return{
       columnlist:[],
+      totallist:[],
       videolist:[],
       sourceID:0,
-      function_imgs:[{path:require('@/assets/f1.png'),label:'人脸检测'}, 
-                     {path:require('@/assets/f2.png'),label:'目标检测与识别'}, 
-                     {path:require('@/assets/f3.png'),label:'PPT画面检测'}, 
-                     {path:require('@/assets/f4.png'),label:'自然场景文本识别'}, 
-                     {path:require('@/assets/f5.png'),label:'语音识别与翻译'}, 
-                     {path:require('@/assets/f6.png'),label:'声纹识别'}],
+      inputContent:'',
+      letterlist:['全部','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','#']
     }
   },
   mounted(){
     this.getColumnList()
-    setTimeout(this.setChangeStyle,500)
-    this.getVideolist()
+    setTimeout(this.setChangeStyle,100)
+    setTimeout(this.setliStyle,500)
   },
   methods: {
     getColumnList(){
@@ -72,77 +48,78 @@ export default {
       }
       axios({
         method: 'get',
-        url: process.env.VUE_APP_severURL + '/getResourceList',
+        url: process.env.VUE_APP_severURL + '/getColumnResourceList',
         contenType: 'application/x-www-form-urlencoded',
         headers: config.headers
       }).then(resp => {
-        var temp = {'resource_id':0, 'resource_name':'全部'}
-        this.columnlist.push(temp)
-        for(var i=0;i<resp.data.data.length;i++){
+        for(var j=0;j<resp.data.data.length;j++){
           var obj = {}
-          obj.resource_id = resp.data.data[i].resource_id
-          obj.resource_name = resp.data.data[i].resource_name
+          obj.resource_id = resp.data.data[j].resource_id
+          obj.resource_name = resp.data.data[j].resource_name
+          obj.resource_initial = resp.data.data[j].resource_initial
+          obj.videoCount = resp.data.data[j].video_count
           this.columnlist.push(obj)
         }
+        this.totallist = this.columnlist
       })
     },
     setChangeStyle(){
       var self = this;
-      var list = document.getElementById('columncontent')
+      var list = document.getElementById('letterDiv')
       var p = list.getElementsByTagName('p')
       p[0].className = 'active'
       for(var i=0;i<p.length;i++){
-        var index = i
         p[i].onclick = function(){
           for(var j=0;j<p.length;j++){
             p[j].className = ''
           }
           this.className = 'active'
-          for(var i=0;i< self.columnlist.length;i++){
-            if(this.innerText == self.columnlist[i].resource_name){
-              self.sourceID = i
-              break
+          if(this.innerText == '全部'){
+            self.columnlist = self.totallist
+          }else{
+            var cl = []
+            for(var i=0;i<self.totallist.length;i++){
+              if(this.innerText == self.totallist[i].resource_initial){
+                cl.push(self.totallist[i])
+              }
             }
+            self.columnlist = cl
           }
-          self.getVideolist()
+          setTimeout(self.setliStyle,500)
         }
       }
     },
-    getVideolist(){
-      let param = new FormData()
-      param.append('sourceID', this.sourceID)
-      axios({
-        method: 'post',
-        url: process.env.VUE_APP_severURL + '/getColumnVideos',
-        contentType: 'application/x-www-form-urlencoded',
-        data: param,
-      }).then(resp => {
-        this.videolist = resp.data.video_items
-      })
-    },
-    to_play_video: function (event) {
-      this.$router.push({
-        path: '/player',
-        name: '视频播放详情页',
-        query: {
-          video_id: event
+    setliStyle(){
+      var self = this
+      var list = document.getElementById('item-list')
+      var li = list.getElementsByTagName('li')
+      for(var i=0;i<li.length;i++){
+        li[i].onmouseover = function(){
+          this.className = 'item-text2'
         }
-      })
+        li[i].onmouseout = function(){
+          this.className = 'item-text'
+        }
+        li[i].onclick = function(){
+          var p = this.getElementsByTagName('p')
+          self.sourceID = parseInt(p[0].innerText)
+          self.$router.push({path:'/videolist', name:'专栏视频列表',query:{source_id: self.sourceID}})
+        }
+      }
     },
-    searchVideosByTitle(data){
-      console.log('搜索视频', data)
-      let param = new FormData()
-      param.append('key', data)
-      param.append('sourceID', this.sourceID)
-      axios({
-        method: 'post',
-        url: process.env.VUE_APP_severURL + '/searchHomeVideos',
-        contentType: 'application/x-www-form-urlencoded',
-        data: param,
-      }).then(resp => {
-        this.videolist = resp.data.video_items
-      })
-    }
+    doSearchColumn(){
+      this.columnlist = []
+      if(this.inputContent==''){
+        this.columnlist = this.totallist
+      }else{
+        for(var i=0;i<this.totallist.length;i++){
+          if(this.totallist[i].resource_name.indexOf(this.inputContent) != -1){
+            this.columnlist.push(this.totallist[i])
+          }
+        }
+      }
+      this.setliStyle()
+    },
   }
 }
 </script>
@@ -157,96 +134,48 @@ export default {
   flex-direction:column;
   cursor: pointer;
 }
-.columnlist{
-  width:99%;
-  height:40px;
-  display:flex;
-  flex-direction:row;
-  background:rgba(100,100,100,0.1);
-  border-radius:25px;
+.el-input{
+  margin-left: 35%;
+  width: 30%;
 }
-.columntitle{
-  display:flex;
-  flex-direction:row;
-  align-items:center;
-  padding-left: 20px;
-}
-.img1{
-  max-height:20px;
-}
-.videolist{
-  flex:1;
-}
-.columncontent{
-  display:flex;
-  flex-direction:row;
-  align-items:center;
-}
-.columntitle > p{
-  font-size: 14px;
-  margin-block-start: 0em;
-  margin-block-end: 0em;
-  padding-left: 10px;
-}
-.columncontent >p {
-  font-size: 14px;
-  margin-block-start: 0em;
-  margin-block-end: 0em;
-  padding-left: 10px;
-  padding-right: 10px;
-}
-.p1{
-  font-weight: bold;
-}
-.p2{
-  color:gray;
-}
-.active{
-  color: rgb(24, 144, 255);
-}
-.image {
-  width: 100%;
-  display: block;
-  background-color: white;
-}
-.bottom {
-  display:flex;
-  flex-direction:row;
-  align-items: center;
-  line-height: 13px;
-  padding-top:10px;
-}
-.bottom > img {
-  max-height:20px;
-}
-.bottom > p {
-  font-size:13px;
-  color: #999;
-  padding-right: 10px;
-  margin-block-start: 0em;
-  margin-block-end: 0em;
-}
-.function{
-  padding-top:10px;
-  display:flex;
-  flex-direction:row;
-  align-items:center;
-}
-.function > p{
-  font-size:13px;
-  color: #999;
-  margin-block-start: 0em;
-  margin-block-end: 0em;
-}
-.function_items{
+.letterDiv{
+  margin-left: 7%;
+  margin-right: 7%;
   display: flex;
   flex-direction: row;
-  align-items: center;
+  justify-content: space-between;
 }
-.funcImg{
-  max-height:16px;
+.letterDiv > p{
+  padding:2px 5px 2px 5px;
 }
-.el-tooltip__popper {
-  padding:5px !important;
+ul li{
+  list-style-type:none;
+  display:inline;
+}
+.item-text{
+  float:left;
+  width:20%;
+  padding-top:10px;
+  padding-bottom:10px;
+  color:black;
+}
+.item-text2{
+  float:left;
+  width:20%;
+  padding-top:10px;
+  padding-bottom:10px;
+  color:rgb(24, 144, 255);
+}
+.item-count{
+  margin-left:10px;
+  font-size:13px;
+  background: rgba(133, 133, 133,0.2);
+  padding:2px 5px 2px 5px;
+  border-radius: 4px;
+}
+
+.active{
+  color: rgb(255, 255, 255);
+  background: rgb(24, 144, 255);
 }
 </style>

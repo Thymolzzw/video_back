@@ -69,16 +69,15 @@ const actions = {
 
   // get user info
   getInfo({ commit, state }) {
-    console.log('logintest', '1233')
     return new Promise((resolve, reject) => {
       let info_data = new FormData()
       info_data.append("user_id", state.token)
-
+      sessionStorage.setItem('token', state.token)
+      console.log('src/store/modules/user.js')
       getInfo(state.token).then(response => {
         if (response.data == null) {
           reject('获取用户信息失败，请重新登录！')
         }
-        console.log("data", response.data)
         const user_account_name = response.data.account_name
         const roles = response.data.roles
 

@@ -11,6 +11,8 @@
         </el-table-column>
         <el-table-column prop="resource_url" label="视频源链接">
         </el-table-column>
+        <el-table-column width="100px" prop="resource_initial" label="视频源名首字母">
+        </el-table-column>
 
         <el-table-column prop="address" label="操作">
           <template slot-scope="scope">
@@ -25,7 +27,7 @@
     <!--新增/编辑界面-->
     <el-dialog :title="titleMap[dialogStatus]" :visible.sync="FormVisible" :close-on-click-modal="false" class="edit-form"
                :before-close="handleClose">
-      <el-form :model="Form" label-width="80px" :rules="editFormRules" ref="Form">
+      <el-form :model="Form" label-width="120px" :rules="editFormRules" ref="Form">
         <el-form-item label="视频源名称" prop="resource_name">
           <el-input v-model="Form.resource_name" auto-complete="off"></el-input>
         </el-form-item>
@@ -34,6 +36,9 @@
         </el-form-item>
         <el-form-item label="视频源链接" prop="resource_url">
           <el-input v-model="Form.resource_url"></el-input>
+        </el-form-item>
+        <el-form-item label="视频源名首字母" prop="resource_initial">
+          <el-input v-model="Form.resource_initial"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -58,7 +63,8 @@ export default {
         resource_id: '',
         resource_name: '',
         resource_introduce: '',
-        resource_url: ''
+        resource_url: '',
+        resource_initial:''
       },
       titleMap: {
         add:'新增',
@@ -76,6 +82,9 @@ export default {
         resource_url: [
           { required: false, message: '请输入视频源链接', trigger: 'blur' }
         ],
+        resource_initial:[
+          { required: false, message: '请输入视频名首字母', trigger:'blur'}
+        ]
       },
 
     }
@@ -94,6 +103,7 @@ export default {
       param.append('resource_name', this.Form.resource_name)
       param.append('resource_introduce', this.Form.resource_introduce)
       param.append('resource_url', this.Form.resource_url)
+      param.append('resource_initial', this.Form.resource_initial)
       param.append('dialog_status', this.dialogStatus)
       axios({
         method: 'post',
@@ -122,6 +132,7 @@ export default {
       this.Form.resource_name = this.resource_list[index].resource_name;
       this.Form.resource_introduce = this.resource_list[index].resource_introduce;
       this.Form.resource_url = this.resource_list[index].resource_url;
+      this.Form.resource_initial = this.resource_list[index].resource_initial;
       this.FormVisible = true;
     },
     clickAddResource: function (){
@@ -134,6 +145,7 @@ export default {
       this.Form.resource_name = '';
       this.Form.resource_introduce = '';
       this.Form.resource_url = '';
+      this.Form.resource_initial = '';
     },
     getResourceList:function(){
       this.resource_list = []

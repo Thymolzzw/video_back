@@ -9,7 +9,7 @@
             <div style="padding: 14px;">
               <span>{{ item1.fields.title }}</span>
               <div class="bottom clearfix">
-                <time class="time">{{ item1.fields.create_time }}</time>
+                <time class="time">{{ item1.fields.add_time }}</time>
                 <el-popconfirm
                   title="确定删除该视频吗？"
                   @onConfirm="del_video(item1.pk)"

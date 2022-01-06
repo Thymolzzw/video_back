@@ -244,7 +244,6 @@ export default {
       // const this_this = this
       alert("login")
       this.$refs.loginForm.validate(valid => {
-        alert("jinru")
         if (valid) {
           this.loading = true
           this.$store.dispatch('user/login', this.loginForm)

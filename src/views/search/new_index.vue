@@ -38,11 +38,11 @@
                 </el-tooltip>
                 <div class="bottom clearfix">
                   <img src='@/assets/video.png' alt=''>
-                  <p>{{item1.video_time}}</p>
+                  <p style="width: 50px;">{{item1.length}}</p>
                   <img src='@/assets/source.png' alt=''>
-                  <p>{{item1.source}}</p>
+                  <p style="width: 80px;">{{item1.source}}</p>
                   <img src='@/assets/clock.png' alt=''>
-                  <p class="time">{{item1.create_time}}</p>
+                  <p class="time" style="width: 80px;">{{item1.create_time}}</p>
                 </div>
                 <div class='function'>
                   <p>功能：</p>
@@ -108,7 +108,6 @@ export default {
       })
         .then(resp => {
           this.promoList = resp.data.video_items
-          console.log(this.promoList)
         })
     },
 
@@ -133,9 +132,11 @@ export default {
 .bottom > p {
   font-size:13px;
   color: #999;
-  padding-right: 10px;
   margin-block-start: 0em;
   margin-block-end: 0em;
+  text-overflow:ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 .function{
   padding-top:10px;
