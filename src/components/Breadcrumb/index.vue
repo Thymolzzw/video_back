@@ -27,8 +27,8 @@ export default {
       this.getBreadcrumb()
       var flag = true
       var content = this.levelList[1].meta.title
-      if(content == '视频搜索' || content == "视频上传" || content == "系统管理" || content == '专栏视频' || content=='视频播放详情页'){
-        flag = false
+      if(content == '主页' || content == "热点视频"){
+        flag = true
       }
       this.$emit('clickNav',flag)
     }

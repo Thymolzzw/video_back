@@ -1275,6 +1275,8 @@ ul li {
 .videoPlayerMain{
   display: flex;
   flex-direction: column;
+  height: 100vh;
+  overflow-y: scroll;
 }
 .player_all{
   display: flex;

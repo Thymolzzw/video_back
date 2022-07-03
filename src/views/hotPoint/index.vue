@@ -139,7 +139,8 @@ export default {
   white-space: nowrap;
 }
 .video_list{
-  height: 820px;
+  /* height: calc(100vh - 70px); */
+  height: 92vh;
 }
 .function{
   padding-top:10px;

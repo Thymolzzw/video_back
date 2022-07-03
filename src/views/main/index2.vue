@@ -7,7 +7,6 @@
         </div>
       </el-carousel-item>
     </el-carousel>
-
     <div class="video_list" v-infinite-scroll="load" style="overflow:auto">
       <el-row>
         <el-col :span="5.5" v-for="(item1, index) in promoList" :key="index" style="padding: 10px" >
@@ -48,6 +47,60 @@ import store from "../../store/index"
 export default ({
   data(){
     return{
+        //级联
+        props: { multiple: false ,expandTrigger: 'hover' },
+        inpput_title:'',
+        input_title_cn: '',
+        value: [],
+        options: [
+          {
+            value: '1',
+            label: '英文标题',
+            children: [{
+              value: 'title',
+              label: '英文标题'}]
+          },
+          {
+            value: '2',
+            label: '中文标题',
+            children: [{
+              value: 'title_cn',
+              label: '中文标题'
+            }]
+          },
+          {
+            value: '3',
+            label: '英文介绍',
+            children: [{
+              value: 'info',
+              label: '英文介绍'
+            }]
+          },
+          {
+            value: '4',
+            label: '中文介绍',
+            children: [{
+              value: 'info_cn',
+              label: '中文介绍'
+            }]
+          },
+          {
+            value: '5',
+            label: '视频标签',
+            children: [{
+              value: 'tags',
+              label: '视频标签'
+            }]
+          },
+          {
+            value: '6',
+            label: '视频源',
+            children: [{
+              value: 'source',
+              label: '视频源'
+            }]
+          },
+        ],
       banners: [],
       promoList: [],
       function_imgs:[{path:require('@/assets/f1.png'),label:'人脸检测'}, 
@@ -71,11 +124,18 @@ export default ({
     this.loginRecord()
     this.get_banners()
     this.get_videos()
-    //var os = require('os')
-    //const IP = require('../../../build/get-ip')
-    //console.log('sss',os)
   },
   methods: {
+     handleChange(e){
+      this.$refs.cascader.dropDownVisible = true
+    },
+    inp(a,node,out_this,data){
+      const cascader = this.$refs.cascader;
+      console.log(node.value)
+      console.log(a)
+      this.inpput_title = ''
+      this.$refs.cascader.dropDownVisible = false
+    },
     time_2_date: function (stamp) {
       var date1 = new Date(stamp)
       return date1.toLocaleDateString().replace(/\//g, "-") + " " + stamp.toTimeString().substr(0, 8);
@@ -163,6 +223,9 @@ export default ({
 </script>
 
 <style scoped>
+#cascader-menu-4721-1{
+  height: 50px !important;
+} 
 .el-carousel__item h3 {
   color: #475669;
   font-size: 14px;
@@ -184,7 +247,7 @@ export default ({
   flex-direction: column;
 }
 .video_list{
-  height: 800px;
+  height: calc(100vh - 350px);
 }
 .bottom {
   display:flex;
